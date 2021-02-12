@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://www.jameswright.xyz/projects/</loc>
+    <lastmod>2020-08-19T10:32:34-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/publication_types/1/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/gaussian-speed-bump/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/james-r.-wright/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/john-a.-evans/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/kenneth-e.-jansen/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/les_dns/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/phasta/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/publication_types/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/riccardo-balin/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/publication/wright-unstructured-dns-turbulent/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/post/wall_shear_gradient_from_velocity_gradient/</loc>
+    <lastmod>2020-08-24T15:36:32-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/categories/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/cfd/</loc>
+    <lastmod>2020-08-24T15:36:32-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/fluids/</loc>
+    <lastmod>2020-08-24T15:36:32-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/math/</loc>
+    <lastmod>2020-08-24T15:36:32-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/categories/notes/</loc>
+    <lastmod>2020-08-24T15:36:32-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/post/vorticity_transport_index_notation/</loc>
+    <lastmod>2020-08-14T19:18:12-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/levi-civita/</loc>
+    <lastmod>2020-08-14T19:18:12-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/post/cross_product_and_curl_in_index_notation/</loc>
+    <lastmod>2020-08-14T19:18:12-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/index-notation/</loc>
+    <lastmod>2020-08-14T19:18:12-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/post/deploy-hugo-academic-using-githubio/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/github-actions/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/github-pages/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/hugo/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/hugo-academic/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/categories/tutorials/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/wowchemy/</loc>
+    <lastmod>2020-10-16T18:04:24-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/publication/scitech_2020/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/hybrid-turbulence-models/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/james-wright/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/john-a-evans/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/john-a-farnsworth/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/john-patterson/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/kenneth-e-jansen/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/nasa-wing-juncture/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/philippe-spalart/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/raj-lakhani/</loc>
+    <lastmod>2021-01-22T14:26:15-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/publication_types/7/</loc>
+    <lastmod>2020-06-08T18:42:39-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/conical-diffusers/</loc>
+    <lastmod>2020-06-08T18:42:39-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/james-ray-wright-iii/</loc>
+    <lastmod>2020-06-08T18:42:39-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/publication/jameswright-static-pressure-recovery/</loc>
+    <lastmod>2020-06-08T18:42:39-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/</loc>
+    <lastmod>2020-08-19T10:32:34-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/privacy/</loc>
+    <lastmod>2020-04-10T09:05:50-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/authors/admin/</loc>
+    <lastmod>2021-02-12T09:36:49-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/tags/ci/cd/</loc>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/post/</loc>
+    <lastmod>2019-11-28T11:24:42-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/publication/</loc>
+    <lastmod>2020-01-16T18:48:25-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.jameswright.xyz/talk/</loc>
+    <lastmod>2019-11-28T11:24:42-07:00</lastmod>
+  </url>
+  
+</urlset>

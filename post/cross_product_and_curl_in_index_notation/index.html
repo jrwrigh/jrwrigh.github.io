@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="James Wright">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Review of how to perform cross products and curls in index summation notation. In essence, this ends up being an overview on how to apply the Levi-Civita symbol in these contexts.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.jameswright.xyz/post/cross_product_and_curl_in_index_notation/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#A6E22D">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/monokai.min.css" crossorigin="anonymous" title="hl-light">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/monokai.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous">
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cutive+Mono%7CLora:400,700%7CRoboto:400,700&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-162278003-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-162278003-2', { 'anonymize_ip': true });
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_huda118e9b915acb252802967a5464c294_334187_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_huda118e9b915acb252802967a5464c294_334187_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="https://www.jameswright.xyz/post/cross_product_and_curl_in_index_notation/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="James Wright">
+  <meta property="og:url" content="https://www.jameswright.xyz/post/cross_product_and_curl_in_index_notation/">
+  <meta property="og:title" content="Cross Product and Curl in Index Notation | James Wright">
+  <meta property="og:description" content="Review of how to perform cross products and curls in index summation notation. In essence, this ends up being an overview on how to apply the Levi-Civita symbol in these contexts."><meta property="og:image" content="img/map[docs_section_pager:%!s(bool=true) gravatar:%!s(bool=false) link_authors:%!s(bool=true) main_menu:map[align:l show_logo:%!s(bool=true)] plugins_js:[] reading_time:%!s(bool=true) section_pager:%!s(bool=false) shape:square sharing:%!s(bool=false)]">
+  <meta property="twitter:image" content="img/map[docs_section_pager:%!s(bool=true) gravatar:%!s(bool=false) link_authors:%!s(bool=true) main_menu:map[align:l show_logo:%!s(bool=true)] plugins_js:[] reading_time:%!s(bool=true) section_pager:%!s(bool=false) shape:square sharing:%!s(bool=false)]"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2020-07-21T18:00:45-06:00">
+    
+    <meta property="article:modified_time" content="2020-08-14T19:18:12-06:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.jameswright.xyz/post/cross_product_and_curl_in_index_notation/"
+  },
+  "headline": "Cross Product and Curl in Index Notation",
+  
+  "datePublished": "2020-07-21T18:00:45-06:00",
+  "dateModified": "2020-08-14T19:18:12-06:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "James Wright"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Wright",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.jameswright.xyz/images/icon_huda118e9b915acb252802967a5464c294_334187_192x192_fill_lanczos_center_2.png"
+    }
+  },
+  "description": "Review of how to perform cross products and curls in index summation notation. In essence, this ends up being an overview on how to apply the Levi-Civita symbol in these contexts."
+}
+</script>
+
+  
+
+  
+
+
+  
+  
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.js" integrity="sha256-5VhCqFam2Cn+yjw61zbBNrbHVJ6SRydPeKopYlngbiQ=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.css" integrity="sha256-zQ0LblD/Af8vOppw18+2anxsuaz3pWYyVWi+bTvTH8Q=" crossorigin="anonymous">
+  
+  <script>
+  window.addEventListener("load", function(){
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "#A6E22D",
+          "text": "#2D2E27"
+        },
+        "button": {
+          "background": "#2D2E27",
+          "text": "#A6E22D"
+        }
+      },
+      "theme": "classic",
+      "content": {
+        "message": "This website uses cookies to ensure you get the best experience on our website.",
+        "dismiss": "Got it!",
+        "link": "Learn more",
+        "href": "/privacy/"
+      }
+    })});
+  </script>
+
+
+
+  
+
+
+
+
+
+  <title>Cross Product and Curl in Index Notation | James Wright</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class="dark">
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">James Wright</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">James Wright</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link  active" href="/post"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/projects"><span>Projects</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/publication"><span>Publications</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Cross Product and Curl in Index Notation</h1>
+
+  
+  <p class="page-subtitle">Or how to use the Levi-Civita symbol.</p>
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+  
+  
+  <div>
+    
+
+  
+  <span><a href="/authors/admin/">James Wright</a></span>
+  </div>
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    Aug 14, 2020
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    4 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/categories/notes/">Notes</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>Here are some brief notes on performing a cross-product using index notation.
+This requires use of the 
+<a href="https://en.wikipedia.org/wiki/Levi-Civita_symbol" target="_blank" rel="noopener">Levi-Civita
+symbol</a>, which may also be
+called the permutation tensor.</p>
+<h2 id="levi-civita-symbol">Levi-Civita Symbol <a href="#levi-civita-symbol" class="hanchor" ariaLabel="Anchor">#&#xFE0E;</a> </h2>
+<p>The Levi-Civita symbol is often expressed using an $\varepsilon$ and takes the
+following definition:</p>
+<p>$$  \varepsilon_{ijk} =
+\begin{cases}
++1 &amp; \text{if } (i,j,k) \text{ is even permutation,} \\<br>
+-1 &amp; \text{if } (i,j,k) \text{ is odd permutation,} \\<br>
+0 &amp; \text{if } i = j, \text{ or } j = k, \text{ or } k = i
+\end{cases}
+$$</p>
+<p>For a 3D system, the definition of an odd or even permutation can be shown in
+
+<a href="#figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg">Figure 1</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<figure id="figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg">
+
+
+  <a data-fancybox="" href="./Permutation_indices_3d_numerical_edit.png" data-caption="Permutation pattern for Levi-Civita symbol in 3D. Altered from source.">
+
+
+  <img src="./Permutation_indices_3d_numerical_edit.png" alt="" width="50%" >
+</a>
+
+
+  
+  
+  <figcaption data-pre="Figure " data-post=":" class="numbered">
+    Permutation pattern for Levi-Civita symbol in 3D. <a href="https://commons.wikimedia.org/wiki/File:Permutation_indices_3d_numerical.svg">Altered from source.</a>
+  </figcaption>
+
+
+</figure>
+
+<p>The permutation is even if the three numbers of the index are in &ldquo;order&rdquo;, given
+allowance to cycle back through the numbers once the end is reached. So if you
+skip to the 1 value in the index, going left-to-right should be in numerical
+order. For example, if given 321 and starting with the 1 we get 1 $\rightarrow$
+3 $\rightarrow$ 2. 132 is not in numerical order, thus it is an odd permutation.</p>
+<p>So given $\varepsilon_{ijk}\,$, if $i$, $j$, and $k$ are $123$, $231$, or $312$,
+then $\varepsilon_{ijk}=1$. Note that the order of the indicies matter. If
+instead we&rsquo;re given $\varepsilon_{jik}$ and any of the three permutations in
+the previous example, then the expression would be equal to $-1$ instead.</p>
+<h2 id="cross-products-in-index-notation">Cross Products in Index Notation <a href="#cross-products-in-index-notation" class="hanchor" ariaLabel="Anchor">#&#xFE0E;</a> </h2>
+<p>Now we get to the implementation of cross products. This involves transitioning
+back and forth from vector notation to index notation. A vector and it&rsquo;s index
+notation equivalent are given as:</p>
+<p>$$ \mathbf{a} = a_i$$</p>
+<p>If we want to take the cross product of this with a vector $\mathbf{b} = b_j$,
+we get:</p>
+<p>$$ \mathbf{a} \times \mathbf{b}  = a_i \times b_j \ \Rightarrow <br>
+\varepsilon_{ijk} a_i b_j = c_k$$</p>
+<p>Note the indices, where the resulting vector $c_k$ inherits the index not used
+by the original vectors. Also note that since the cross product is
+anticommutative (ie. $\mathbf{a} \times \mathbf{b} = - \mathbf{b} \times
+\mathbf{a}$ ), changing the order of the vectors being crossed requires
+changing the indices of the Levi-Civita symbol or adding a negative:</p>
+<p>$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j =
+-\varepsilon_{ijk} a_i b_j = c_k$$</p>
+<p>Conversely, the commutativity of multiplication (which is valid in index
+notation) means that the vector order <em>can</em> be changed without changing the
+permutation symbol indices or anything else:</p>
+<p>$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j  =
+\varepsilon_{jik} b_j a_i$$</p>
+<h3 id="rules-of-thumb-for-setting-indices-correctly">Rule(s) of Thumb for Setting Indices Correctly <a href="#rules-of-thumb-for-setting-indices-correctly" class="hanchor" ariaLabel="Anchor">#&#xFE0E;</a> </h3>
+<ol>
+<li>Start the indices of the permutation symbol with the index of the resulting
+vector.</li>
+</ol>
+<p>This will often be the free index of the equation that
+the cross product lives in and I normally like to have the free index as the
+leading index in multi-index terms.</p>
+<ol start="2">
+<li>The next two indices need to be in the same order as the vectors from the
+cross product.</li>
+</ol>
+<p>Using these rules, say we want to replicate $a_\ell \times b_k = c_j$. Then the
+first index needs to be $j$ since $c_j$ is the resulting vector. The other 2
+indices must be $\ell$ and $k$ then. This results in:</p>
+<p>$$ a_\ell \times b_k = c_j \quad \Rightarrow \quad \varepsilon_{j\ell k} a_\ell
+b_k = c_j$$</p>
+<h2 id="curl-in-index-notation">Curl in Index Notation <a href="#curl-in-index-notation" class="hanchor" ariaLabel="Anchor">#&#xFE0E;</a> </h2>
+<p>The curl is given as the cross product of the gradient and some vector field:</p>
+<p>$$ \mathrm{curl}({a_j}) = \nabla \times a_j  = b_k $$</p>
+<p>In index notation, this would be given as:</p>
+<p>$$ \nabla \times a_j  = b_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i a_j =
+b_k $$</p>
+<p>where $\partial_i$ is the differential operator $\frac{\partial}{\partial
+x_i}$.</p>
+<div class="alert alert-warning">
+  <div>
+    Note that $\partial_k$ is <em><strong>not</strong></em> commutative since it is an operator. It may be
+better to write $\partial_k u_i$ as $\partial_k (u_i)$ to more explicitly
+denote it&rsquo;s nature as an operator on $u_i$.
+  </div>
+</div>
+<p>These follow the same rules as with a normal cross product, but the
+first &ldquo;vector&rdquo; is always going to be the differential operator. Since $\nabla$
+is hardly ever defined with an index, the 
+<a href="#rules-of-thumb-for-setting-indices-correctly">rule of
+thumb</a> can come in handy when
+trying to translate vector notation curl into index notation.</p>
+<p>For example, if I have a vector $u_i$ and I want to take the curl of it, first
+I need to decide what I want the resulting vector index to be. Let&rsquo;s make it be
+$\ell$.  Due to index summation rules, the index we assign to the differential
+operator may be any character that isn&rsquo;t $i$ or $\ell$ in our case. Let&rsquo;s make
+it be $k$. Putting that all together we get:</p>
+<p>$$ \mathrm{curl}(u_i) = \varepsilon_{\ell ki} \partial_k u_i = \omega_\ell $$</p>
+
+    </div>
+
+    
+
+
+
+
+
+  
+  
+
+<p class="edit-page">
+  <a href="https://github.com/jrwrigh/jameswright.xyz_source/edit/master/content/post/cross_product_and_curl_in_index_notation/index.md">
+    <i class="fas fa-pen pr-2"></i>Edit this page
+  </a>
+</p>
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/index-notation/">index notation</a>
+  
+  <a class="badge badge-light" href="/tags/levi-civita/">Levi-Civita</a>
+  
+  <a class="badge badge-light" href="/tags/math/">math</a>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <img class="avatar mr-3 avatar-square" src="/authors/admin/avatar_hu8685ca00ce77b7daa12767e3ee052ec4_1910556_270x270_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="https://www.jameswright.xyz/">James Wright</a></h5>
+      <h6 class="card-subtitle">PhD Student, Aerospace Engineering</h6>
+      <p class="card-text">I&rsquo;m interested in CFD, turbulence modeling, motorsports, and disc golf.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+    <li>
+      <a href="mailto:james@jameswright.xyz" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://scholar.google.com/citations?user=d6opMNsAAAAJ&amp;hl=en" target="_blank" rel="noopener">
+        <i class="ai ai-google-scholar"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://linkedin.com/in/jameswrightiii" target="_blank" rel="noopener">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/jrwrigh" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://orcid.org/0000-0001-7273-049X" target="_blank" rel="noopener">
+        <i class="ai ai-orcid"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://publons.com/researcher/3368218/james-wright/" target="_blank" rel="noopener">
+        <i class="ai ai-publons"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/vorticity_transport_index_notation/">Deriving Vorticity Transport in Index Notation</a></li>
+      
+      <li><a href="/post/wall_shear_gradient_from_velocity_gradient/">Calculate Wall Shear Gradient from Velocity Gradient</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.8/mermaid.min.js" integrity="sha256-lyWCDMnMeZiXRi7Zl54sZGKYmgQs4izcT7+tKc+KUBk=" crossorigin="anonymous" title="mermaid"></script>
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin="anonymous"></script>
+        
+      
+
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js" integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    <script>const isSiteThemeDark = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.c816d323c3a55093dae0829b44ea1ca8.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+  <p class="powered-by">
+    
+      <a href="/privacy/">Privacy Policy</a>
+    
+    
+  </p>
+  
+
+  <p class="powered-by">
+    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+<img style="display:block;margin: 0 auto" class="display-centered" alt="Creative Commons License"
+src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+</a>
+<br />
+<span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">
+This work</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="/" property="cc:attributionName"
+rel="cc:attributionURL">James Wright</a> is licensed under a <a rel="license"
+href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0
+International License</a>.<br />
+Permissions beyond the scope of this license may be available at <a
+xmlns:cc="http://creativecommons.org/ns#" href="mailto:james@jameswright.xyz"
+rel="cc:morePermissions">james@jameswright.xyz</a>. &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

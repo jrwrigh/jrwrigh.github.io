@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories | James Wright</title>
+    <link>https://www.jameswright.xyz/categories/</link>
+      <atom:link href="https://www.jameswright.xyz/categories/index.xml" rel="self" type="application/rss+xml" />
+    <description>Categories</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright><lastBuildDate>Thu, 13 Aug 2020 09:49:47 -0600</lastBuildDate>
+    <image>
+      <url>img/map[docs_section_pager:%!s(bool=true) gravatar:%!s(bool=false) link_authors:%!s(bool=true) main_menu:map[align:l show_logo:%!s(bool=true)] plugins_js:[] reading_time:%!s(bool=true) section_pager:%!s(bool=false) shape:square sharing:%!s(bool=false)]</url>
+      <title>Categories</title>
+      <link>https://www.jameswright.xyz/categories/</link>
+    </image>
+    
+  </channel>
+</rss>
