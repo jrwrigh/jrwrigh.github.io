@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>James Wright</title>
+    <link>https://www.jameswright.xyz/authors/james-wright/</link>
+      <atom:link href="https://www.jameswright.xyz/authors/james-wright/index.xml" rel="self" type="application/rss+xml" />
+    <description>James Wright</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright><lastBuildDate>Tue, 28 Mar 2023 09:22:48 -0600</lastBuildDate>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_huda118e9b915acb252802967a5464c294_334187_512x512_fill_lanczos_center_3.png</url>
+      <title>James Wright</title>
+      <link>https://www.jameswright.xyz/authors/james-wright/</link>
+    </image>
+    
+    <item>
+      <title>Performance-Portable Implicit Scale-Resolving Compressible Flow Using libCEED</title>
+      <link>https://www.jameswright.xyz/publication/siam_cse23_implicit_srs_with_libceed/</link>
+      <pubDate>Tue, 28 Mar 2023 09:22:48 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/publication/siam_cse23_implicit_srs_with_libceed/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Collocation Methods from Interpolation</title>
+      <link>https://www.jameswright.xyz/post/20220925/collocation-methods-from-interpolation/</link>
+      <pubDate>Sun, 25 Sep 2022 11:34:16 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20220925/collocation-methods-from-interpolation/</guid>
+      <description>&lt;details class=&#34;toc-inpage d-print-none  &#34; open&gt;
+  &lt;summary class=&#34;font-weight-bold&#34;&gt;Table of Contents&lt;/summary&gt;
+  &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#intro&#34;&gt;Intro&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#interpolation-fundamentals&#34;&gt;Interpolation Fundamentals&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#collocation-overview&#34;&gt;Collocation Overview&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#collocation-for-a-generic-differential-equation&#34;&gt;Collocation for a Generic Differential Equation&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#defining-the-solution-function&#34;&gt;Defining the Solution Function&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#defining-the-constraints&#34;&gt;Defining the Constraints&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#determining-the-collocation-points&#34;&gt;Determining the Collocation Points&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#creating-the-system-of-equations&#34;&gt;Creating the System of Equations&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#matrix-form&#34;&gt;Matrix Form&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#residual-form&#34;&gt;Residual form&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#example-pde-poisson&#34;&gt;Example PDE: Poisson&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#creating-the-system-of-equations-1&#34;&gt;Creating the System of Equations&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#appendix-a-determining-collocation-points-continued&#34;&gt;Appendix A: Determining Collocation Points Continued&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#how-many&#34;&gt;How many?&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#where-should-the-collocation-points-be-located&#34;&gt;Where should the collocation points be located?&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/details&gt;
+&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
+&lt;p&gt;Collocation methods are a way of approximately solving differential equations (both partial and ordinary).
+They are very simple to code and implement.&lt;/p&gt;
+&lt;p&gt;This article will cover collocation methods as an extension of simple interpolation. If you&amp;rsquo;re not familiar with interpolation theory, see &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/&#34;&gt;&lt;strong&gt;Interpolation Theory 101&lt;/strong&gt;&lt;/a&gt;.
+Even if you are, I&amp;rsquo;ll give a quick rundown of the parts of interpolation theory that you&amp;rsquo;ll need for this article:&lt;/p&gt;
+&lt;h2 id=&#34;interpolation-fundamentals&#34;&gt;Interpolation Fundamentals&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;We want to find a function $g(x)$ such that it meets a set of $m+1$ constraints $g(x_i) = y_i$&lt;/li&gt;
+&lt;li&gt;We assume $g(x)$ to be of the form $g(x) = \sum_{i=0}^N c_i  \phi_i(x)$ &lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/li&gt;
+&lt;li&gt;To ensure existence and uniqueness of the solution, we prescribe that the number of degrees-of-freedom (DOFs) $N+1$ equals the number of constraints $m+1$&lt;/li&gt;
+&lt;li&gt;Expanding $g(x)$ for each constraint results in a system of equations with $N+1$ DOFs and $m+1$ equations.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Normal interpolation sets constraints on the value of the function $g$ itself.
+I also introduced &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#slope-constraints&#34;&gt;slope constraints&lt;/a&gt;, which sets a constraint on the slope of the polynomial rather than the polynomial itself.&lt;/p&gt;
+&lt;p&gt;Collocation is a further continuation of that; &lt;strong&gt;we set the constraint(s) that the function must satisfy a differential equation at select locations&lt;/strong&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;collocation-overview&#34;&gt;Collocation Overview&lt;/h2&gt;
+&lt;p&gt;In collocation, we&amp;rsquo;re doing the exact same procedure as in interpolation, but with different constraints.
+These constraints come in two forms:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Boundary conditions&lt;/li&gt;
+&lt;li&gt;Satisfying a differential equation&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Boundary condition constraints look &lt;em&gt;identical&lt;/em&gt; to normal interpolation constraints; we prescribe the value of our function (or of the function derivative) at some specific location.&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;
+The satisfaction of the differential equation is where things are a bit more interesting.&lt;/p&gt;
+&lt;h2 id=&#34;collocation-for-a-generic-differential-equation&#34;&gt;Collocation for a Generic Differential Equation&lt;/h2&gt;
+&lt;p&gt;For a given differential equation (DE), assume we can write it in the form:&lt;/p&gt;
+&lt;p&gt;$$\mathcal{L}(u) = f$$&lt;/p&gt;
+&lt;p&gt;for $\mathcal{L}$ the DE operator, $u$ the solution function, and $f$ some source function.
+For example, the Poisson PDE is given by $u&amp;rsquo;&amp;rsquo;(x) = f$, therefore $\mathcal{L}(u) = u&amp;rsquo;&amp;rsquo;$.
+Another, more complicated example, would be the &lt;a href=&#34;https://en.wikipedia.org/wiki/Blasius_boundary_layer#Blasius_equation_-_first-order_boundary_layer&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Blasius Boundary layer equation&lt;/a&gt;, which is given as $2u&amp;rsquo;&amp;rsquo;&amp;rsquo; + u&amp;rsquo;&amp;rsquo; u = 0$.
+In this case, $\mathcal{L}(u) = 2u&amp;rsquo;&amp;rsquo;&amp;rsquo; + u&amp;rsquo;&amp;rsquo; u$.&lt;/p&gt;
+&lt;p&gt;The DE is subject to boundary conditions (and/or initial conditions).
+We will assume that the domain of the problem is $x = [0,1]$, and thus the boundaries are at $x=0$ and $x=1$.
+We assume two boundary conditions, though generally the number of boundary conditions for a general DE is determined by&lt;/p&gt;
+
+
+
+$$ 
+\begin{align*}
+	u&#39;(1) &amp;= a \\
+	u&#39;&#39;(1) &amp;= b
+\end{align*}
+$$
+
+&lt;h3 id=&#34;defining-the-solution-function&#34;&gt;Defining the Solution Function&lt;/h3&gt;
+&lt;p&gt;Following the steps from interpolation, we need to assume a form for our function.
+We&amp;rsquo;ll denote this function as $u^h$, which will be an approximate solution to the PDE.
+We assume the form:&lt;/p&gt;
+&lt;p&gt;$$u^h(x) = \sum_{n=0}^N c_n \phi_n(x)$$&lt;/p&gt;
+&lt;p&gt;where $c_n$ are our DOFs/coefficients and $\phi_n(x)$ are our basis functions.
+The choice of $\phi_n(x)$ is left arbitrary for this article.
+A few options are &lt;a href=&#34;https://mathworld.wolfram.com/LegendrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Legendre&lt;/a&gt;, &lt;a href=&#34;https://mathworld.wolfram.com/LaguerrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Laguerre&lt;/a&gt;, and &lt;a href=&#34;https://mathworld.wolfram.com/ChebyshevPolynomialoftheFirstKind.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev&lt;/a&gt; polynomials (which all have their own special properties, not discussed here),
+or non-polynomial basis functions, such as the &lt;a href=&#34;https://en.wikipedia.org/wiki/Fourier_series&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Fourier series&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;By defining $u=u^h$, we approximate the continuous PDE given above as:
+
+
+
+$$
+\begin{align*}
+    \mathcal{L}(u^h) &amp;= f \\
+    u&#39;^{\,h}(1) &amp;= a \\
+    u&#39;&#39;^{\,h}(1) &amp;= b
+\end{align*}
+$$
+&lt;/p&gt;
+&lt;h3 id=&#34;defining-the-constraints&#34;&gt;Defining the Constraints&lt;/h3&gt;
+&lt;p&gt;Before we determine the number of DOFs ($N+1$), we need to know the number of constraints.
+I&amp;rsquo;ve already mentioned that the boundary conditions represent constraints, so each boundary condition represents a constraint.
+We&amp;rsquo;ll denote the number of boundary constraints as $m_b$.&lt;/p&gt;
+&lt;p&gt;But for &amp;ldquo;Satisfying the differential equation&amp;rdquo;, the PDE is defined for the entire domain, not discrete locations.
+This is equivalent to defining an infinite number of constraints, one for for every possible location within the domain.
+This is obviously not feasible.&lt;/p&gt;
+&lt;p&gt;Therefore, &lt;strong&gt;we choose a select number of locations in the domain to enforce the PDE&lt;/strong&gt;.
+The locations that we use are called &lt;strong&gt;collocation points&lt;/strong&gt;.
+We&amp;rsquo;ll denote the number of collocation points as $m_c$.&lt;/p&gt;
+&lt;p&gt;So the total number of constraints are the number of boundary conditions plus the number of collocation points.
+Since we need the number of DoFs to match the number of constraints (see &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#polynomial-order&#34;&gt;Interpolation Theory 101&lt;/a&gt;), we get:&lt;/p&gt;
+&lt;p&gt;$$N + 1 = m_b + m_c $$&lt;/p&gt;
+&lt;h3 id=&#34;determining-the-collocation-points&#34;&gt;Determining the Collocation Points&lt;/h3&gt;
+&lt;p&gt;We still need to determine how many collocation points and where on the domain they should be.
+This is a more nuanced discussion, so I&amp;rsquo;ve moved a more detailed discussion of it to &lt;a href=&#34;#appendix-a-determining-collocation-points-continued&#34;&gt;Appendix A&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;For right now, we&amp;rsquo;ll assume the number of collocation points is arbitrary and that the points are evenly distributed across the domain.
+We denote the set of collocation point locations as:&lt;/p&gt;
+
+
+
+$$\left\{\xi_j \right\}_{j=1}^{m_ c}$$
+
+&lt;h3 id=&#34;creating-the-system-of-equations&#34;&gt;Creating the System of Equations&lt;/h3&gt;
+&lt;p&gt;To create the system of equations, just like with interpolation, we simply express each constraint in terms of $u^h$ and expand the definition of it.
+So for our boundary conditions, we end up with:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+u&#39;^{\,h}(1) = a \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;(1) + c_1 \phi_1&#39;(1) + \dots + c_N \phi_N&#39;(1) = a \\
+u&#39;&#39;^{\,h}(1) = b \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(1) + c_1 \phi_1&#39;&#39;(1) + \dots + c_N \phi_N&#39;&#39;(1) = b
+\end{align*}
+$$
+
+&lt;p&gt;The &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#slope-constraints&#34;&gt;slope constraints section of my interpolation theory post&lt;/a&gt; has a derivation for 
+
+$u&#39;^{\, h}(x) = \sum_{n=0}^N c_n \phi_n&#39;(x)$.&lt;/p&gt;
+&lt;p&gt;Next, we do the same for the collocation points.
+This forms a set of $m_c$ equations:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+\mathcal{L}(u^h(\xi_1)) &amp;= f(\xi_1) \\
+\mathcal{L}(u^h(\xi_2)) &amp;= f(\xi_2) \\
+\vdots  \\
+\mathcal{L}(u^h(\xi_{m_c})) &amp;= f(\xi_{m_c}) \\
+\end{align*}
+$$
+
+&lt;h3 id=&#34;matrix-form&#34;&gt;Matrix Form&lt;/h3&gt;
+&lt;p&gt;If $\mathcal{L}$ is linear, we can express the PDE as:&lt;/p&gt;
+&lt;p&gt;$$\mathcal{L}(\sum_{n=0}^N c_n \phi_n(x)) = \sum_{n=0}^N c_n \mathcal{L}(\phi_n(x))$$&lt;/p&gt;
+&lt;p&gt;An example of a linear operator would be the Poisson equation $\mathcal{L}(u) = u&amp;rsquo;&amp;rsquo;$, since the derivative operator is a linear operator itself.&lt;/p&gt;
+&lt;p&gt;We can take the coefficients $c_n$ and move them into a separate vector $c$ and can form a $(N+1) \times (N+1)$:&lt;/p&gt;
+
+
+
+$$
+\begin{bmatrix}
+\phi_0(1) &amp; \phi_1(1) &amp; \cdots &amp; \phi_N(1) \\[8pt]
+\phi&#39;_0(1) &amp; \phi&#39;_1(1) &amp; \cdots &amp; \phi&#39;_N(1) \\[8pt]
+\mathcal{L}(\phi_0(\xi_1)) &amp; \mathcal{L}(\phi_1(\xi_1)) &amp; \cdots &amp; \mathcal{L}(\phi_N(\xi_1)) \\[8pt]
+\vdots  &amp; \vdots  &amp; \ddots &amp; \vdots  \\[8pt]
+\mathcal{L}(\phi_0(\xi_{m_c})) &amp; \mathcal{L}(\phi_1(\xi_{m_c})) &amp; \cdots &amp; \mathcal{L}(\phi_N(\xi_{m_c}))
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\[8pt]
+c_1 \\[8pt]
+c_2 \\[8pt]
+\vdots  \\[8pt]
+c_N \\[8pt]
+\end{bmatrix}
+
+=
+\begin{bmatrix}
+a \\[8pt]
+b \\[8pt]
+f(\xi_1) \\[8pt]
+\vdots  \\[8pt]
+f(\xi_{m_c}) \\[8pt]
+\end{bmatrix}
+$$
+
+&lt;h3 id=&#34;residual-form&#34;&gt;Residual form&lt;/h3&gt;
+&lt;p&gt;If $\mathcal{L}$ is a nonlinear differential operator, we cannot bring the sum over coefficients out of the operator argument.
+An example of a nonlinear differential operator would be the Blasius equation $\mathcal{L}(u) = 2u&amp;rsquo;&amp;rsquo;&amp;rsquo; + u&amp;rsquo;&amp;rsquo; u$.
+The $u&amp;rsquo;&amp;rsquo; u$ term is specifically what makes the differential operator non-linear.&lt;/p&gt;
+&lt;p&gt;Since we cannot separate the coefficients from a nonlinear operator argument, we cannot form a matrix system of equations.
+Instead, we need to create a residual function, which can then be used by a nonlinear equation solver to find our solution.&lt;/p&gt;
+&lt;p&gt;To obtain the residual function, we simply take the system of equations defined &lt;a href=&#34;#creating-the-system-of-equations&#34;&gt;above&lt;/a&gt; and shift all the terms to the left-hand side such that they all equal zero.
+Since the coefficients $c_n$ completely define $u^h$, we often say that the residual is a function of the coefficients.
+Doing this, we obtain:&lt;/p&gt;
+
+
+
+$$
+R(u^h) =
+R \left(
+\begin{bmatrix}
+c_0 \\[8pt]
+c_1 \\[8pt]
+c_2 \\[8pt]
+\vdots  \\[8pt]
+c_N \\[8pt]
+\end{bmatrix}
+\right)
+= 
+
+\begin{bmatrix}
+\sum_{i=0}^N c_i \phi_i(1) - a \\[8pt]
+\sum_{i=0}^N c_i \phi&#39;_i(1) -b \\[8pt]
+\mathcal{L}\left(u^h(\xi_1)\right) - f(\xi_1) \\[8pt]
+\vdots  \\[8pt]
+\mathcal{L}\left(u^h(\xi_{m_c})\right) - f(\xi_{m_c}) \\[8pt]
+\end{bmatrix}
+$$
+
+&lt;h2 id=&#34;example-pde-poisson&#34;&gt;Example PDE: Poisson&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s apply this to the 1-D Poisson equation for a domain of $x \in [0,1]$:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+    u&#39;&#39;(x) &amp;= f(x) \quad x \in [0,1] \\
+    u(0) &amp;= 1 \\
+    u&#39;(1) &amp;= 2
+\end{align*}
+$$
+
+&lt;p&gt;where the last two equations are our boundary conditions.&lt;/p&gt;
+&lt;p&gt;We take the same general form of $u^h$ as in the general case:&lt;/p&gt;
+&lt;p&gt;$$u^h(x) = \sum_{n=0}^N c_n \phi_n(x)$$&lt;/p&gt;
+&lt;p&gt;By defining $u=u^h$, we approximate the continuous PDE given above as:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+    u&#39;&#39;^{\,h}(x) &amp;= f(x) \quad x \in [0,1] \\
+    u^h(0) &amp;= 1 \\
+    u&#39;^{\,h}(1) &amp;= 2
+\end{align*}
+$$
+
+&lt;h3 id=&#34;creating-the-system-of-equations-1&#34;&gt;Creating the System of Equations&lt;/h3&gt;
+&lt;p&gt;For our boundary conditions, we end up with:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+u^h(0) = 1 \quad &amp;\Rightarrow \quad c_0 \phi_0(0) + c_1 \phi_1(0) + \dots + c_N \phi_N(0) = 1 \\
+u&#39;^{\,h}(1) = 2 \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;(1) + c_1 \phi_1&#39;(1) + \dots + c_N \phi_N&#39;(1) = 2
+\end{align*}
+$$
+
+&lt;p&gt;For the PDE itself, we just evaluate the PDE approximated with $u^h$ at the collocation points:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+u&#39;&#39;^{\,h}(\xi_1) =  \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(\xi_1) + c_1 \phi_1&#39;&#39;(\xi_1) + \dots + c_N \phi_N&#39;&#39;(\xi_1) = f(\xi_1) \\
+u&#39;&#39;^{\,h}(\xi_2) =  \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(\xi_2) + c_1 \phi_1&#39;&#39;(\xi_2) + \dots + c_N \phi_N&#39;&#39;(\xi_2) = f(\xi_2) \\
+\vdots \\
+u&#39;&#39;^{\,h}(\xi_{m_c}) =  \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(\xi_{m_c}) + c_1 \phi_1&#39;&#39;(\xi_{m_c}) + \dots + c_N \phi_N&#39;&#39;(\xi_{m_c}) = f(\xi_{m_c}) \\
+\end{align*}
+$$
+
+&lt;p&gt;Since the Poisson operator is linear, we can form the following matrix problem:&lt;/p&gt;
+
+
+
+$$
+\begin{bmatrix}
+\phi_0(0) &amp;  \phi_1(0) &amp; \dots &amp;  \phi_N(0) \\
+\phi_0&#39;(1) &amp;  \phi_1&#39;(1) &amp; \dots &amp;  \phi_N&#39;(1)  \\
+\phi_0&#39;&#39;(\xi_1) &amp;  \phi_1&#39;&#39;(\xi_1) &amp; \dots &amp;  \phi_N&#39;&#39;(\xi_1) \\
+\phi_0&#39;&#39;(\xi_2) &amp;  \phi_1&#39;&#39;(\xi_2) &amp; \dots &amp;  \phi_N&#39;&#39;(\xi_2) \\
+\vdots  &amp; \vdots  &amp; \ddots &amp; \vdots  \\[8pt]
+\phi_0&#39;&#39;(\xi_{m_c}) &amp;  \phi_1&#39;&#39;(\xi_{m_c}) &amp; \dots &amp;  \phi_N&#39;&#39;(\xi_{m_c}) \\
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+c_2 \\
+c_3 \\
+\vdots  \\
+c_N \\
+\end{bmatrix}
+
+=
+\begin{bmatrix}
+1 \\
+2 \\
+f(\xi_1) \\
+f(\xi_2) \\
+\vdots  \\
+f(\xi_{m_c}) \\
+\end{bmatrix}
+$$
+
+&lt;p&gt;And tada! You have the collocation method for the Poisson PDE.
+All you need to do is solve this matrix equation for the DOFs $c_n$ and then reconstruct $u^h$ to have your solution!&lt;/p&gt;
+&lt;h2 id=&#34;appendix-a-determining-collocation-points-continued&#34;&gt;Appendix A: Determining Collocation Points Continued&lt;/h2&gt;
+&lt;p&gt;Note we have yet to determine the number of collocation points or the location of the collocation points.&lt;/p&gt;
+&lt;h3 id=&#34;how-many&#34;&gt;How many?&lt;/h3&gt;
+&lt;p&gt;Choosing the number of collocation points $m_c$ is completely arbitrary.
+Even if $u^h$ exactly satisfies the PDE at the collocation points, there are no guarantees how well (or poorly) $u^h$ satisfies the PDE for the rest of the domain.
+What we do know is that the more points you have, the more accurate your solution becomes (generally).
+How many points is &amp;ldquo;good enough&amp;rdquo; is highly problem dependent.&lt;/p&gt;
+&lt;p&gt;Beyond accuracy though, increasing the number of points also increases the size of your system of equations.
+Depending on your choice of collocation locations and basis functions, the system of equations you end up with may be infeasible to solve.&lt;/p&gt;
+&lt;h3 id=&#34;where-should-the-collocation-points-be-located&#34;&gt;Where should the collocation points be located?&lt;/h3&gt;
+&lt;p&gt;This is also an arbitrary choice; they can be wherever you want them to be.
+But this choice can have significant implications on the stiffness of your resulting system of equations.&lt;/p&gt;
+&lt;p&gt;The general advice is to choose locations that are the roots of some $m_c -1$ order orthogonal polynomial.
+The reason for this choice is beyond the scope of the article, but it is intimately related to Gauss quadrature (which also uses the roots of orthogonal polynomials).&lt;/p&gt;
+&lt;p&gt;A good general choice to place collocation points at &lt;a href=&#34;https://en.wikipedia.org/wiki/Chebyshev_nodes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev nodes&lt;/a&gt;, which are the roots of &lt;a href=&#34;https://en.wikipedia.org/wiki/Chebyshev_polynomials&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev polynomials&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;This is not strictly necessary, but for ease of teaching (and it&amp;rsquo;s broad applicability), we&amp;rsquo;ll make this assumption. See &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#non-linear-gx-with-respect-to-degrees-of-freedom&#34;&gt;the interpolation appendix&lt;/a&gt; for more information about that.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34;&gt;
+&lt;p&gt;This is true for Dirichlet ($u=g$) and Neumann ($u&amp;rsquo;=h$) boundary conditions, and any other boundary conditions that specifies a value for the solution function or it&amp;rsquo;s derivative. However, this is not true for other classes of boundary conditions, such as &lt;a href=&#34;https://en.wikipedia.org/wiki/Robin_boundary_condition&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Robin boundary conditions&lt;/a&gt; ($gu + hu&amp;rsquo; = a$). For Robin and it&amp;rsquo;s ilk, you would express it as a differential operator acting only on the boundary ($\mathcal{L}(u) = gu + hu&amp;rsquo; = a$ on the boundary).&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Interpolation Theory 101</title>
+      <link>https://www.jameswright.xyz/post/20220925/interpolation-theory-101/</link>
+      <pubDate>Sun, 25 Sep 2022 09:47:26 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20220925/interpolation-theory-101/</guid>
+      <description>
+
+&lt;details class=&#34;toc-inpage d-print-none  &#34; open&gt;
+  &lt;summary class=&#34;font-weight-bold&#34;&gt;Table of Contents&lt;/summary&gt;
+  &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#interpolation-problem-intro&#34;&gt;Interpolation Problem Intro&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#polynomial-order&#34;&gt;Polynomial order&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#solving-the-interpolation-problem&#34;&gt;Solving the interpolation problem&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#for-arbitrary-function-basis&#34;&gt;For arbitrary function basis&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#slope-constraints&#34;&gt;Slope constraints&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#appendix-a-further-thoughts-on-non-polynomial-functions&#34;&gt;Appendix A: Further thoughts on non-polynomial functions&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#required-degrees-of-freedom-for-gx&#34;&gt;Required Degrees-of-freedom for $g(x)$&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#non-linear-gx-with-respect-to-degrees-of-freedom&#34;&gt;Non-linear $g(x)$ with respect to degrees-of-freedom&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/details&gt;
+
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Pre-requisites: There are a few assumptions made for the reader&amp;rsquo;s background.
+Mainly, that you&amp;rsquo;re familiar with the concept of a &lt;em&gt;basis&lt;/em&gt; in the linear algebra sense and, in particular, function space bases (such as the monomials).
+Also, being familiar with turning a system of linear equations into it&amp;rsquo;s equivalent matrix form would be beneficial.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;interpolation-problem-intro&#34;&gt;Interpolation Problem Intro&lt;/h2&gt;
+&lt;p&gt;In interpolation, we wish to find a function $g(x)$ that satisfies $g(x_i) = y_i$ for some positive number $i$. We&amp;rsquo;ll call these &lt;strong&gt;constraints&lt;/strong&gt; on the function $g(x)$. We say that the constraint is &lt;em&gt;satisfied&lt;/em&gt; if $g(x)$ passes through the point $(x_i, y_i)$.&lt;/p&gt;
+&lt;p&gt;In the case of polynomial interpolation, we assume a form
+$$g(x) = \sum_{n=0}^N c_n \phi_n(x)$$&lt;/p&gt;
+&lt;p&gt;where $\phi_n(x)$ represents some set of &lt;a href=&#34;https://en.wikipedia.org/wiki/Basis_function&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;basis functions&lt;/a&gt;. The simplest case of this is the monomials, where $\phi_n(x) = x^n$, such that:&lt;/p&gt;
+&lt;p&gt;$$g(x) = c_0  + c_1 x + c_2 x^2 + \dots + c_N x^{N}$$&lt;/p&gt;
+&lt;p&gt;This forms a basis for the space of $N$th order polynomials.
+However, we can choose $\phi_n$ to be any set of basis functions for polynomials, such as the &lt;a href=&#34;https://mathworld.wolfram.com/LegendrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Legendre&lt;/a&gt;, &lt;a href=&#34;https://mathworld.wolfram.com/LaguerrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Laguerre&lt;/a&gt;, and &lt;a href=&#34;https://mathworld.wolfram.com/ChebyshevPolynomialoftheFirstKind.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev&lt;/a&gt; polynomials (which all have their own special properties, not discussed here).
+You can even have non-polynomial basis functions, such as the &lt;a href=&#34;https://en.wikipedia.org/wiki/Fourier_series&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Fourier series&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;For just right now though, I&amp;rsquo;ll stick to talking about $g(x)$ living in the space of polynomials.&lt;/p&gt;
+&lt;h2 id=&#34;polynomial-order&#34;&gt;Polynomial order&lt;/h2&gt;
+&lt;p&gt;A question does remain though: What kind (order) of polynomial should we try to interpolate with?&lt;/p&gt;
+&lt;p&gt;Well, if we have $m+1$ constraints, then we need, &lt;em&gt;at minimum&lt;/em&gt;, a $m$th order polynomial to interpolate them. For example, we need 2 points ($m+1=2 \ \therefore m=1$) to make a line ($N = m = 1$ order polynomial).&lt;/p&gt;
+&lt;p&gt;So what about polynomials greater than order $m$? Well, then an infinite number polynomials satisfy the constraints. Example: If we only have 1 constraint ($m+1=1 \ \therefore m=0$) and there are an infinite number of lines that can satisfy that constraint.&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;d like for a solution to the problem to exist ($N \geq m$) and for that solution to be unique ($N &amp;lt; m+1$). Therefore, &lt;strong&gt;the order of the polynomial should be one less than the number of constraints ($N = m$)&lt;/strong&gt;.&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt;Alternative Thought Process&lt;/summary&gt;
+&lt;p&gt;An alternative way of thinking about it is that our constraints setup $m+1$ equations.
+To find a solution, we must have the number of unknowns match the number of equations.
+Since a $N$th order polynomial has $N+1$ unknowns, then $N + 1 = m + 1 \ \rightarrow \ N = m$.&lt;/p&gt;
+&lt;/details&gt;
+&lt;h2 id=&#34;solving-the-interpolation-problem&#34;&gt;Solving the interpolation problem&lt;/h2&gt;
+&lt;p&gt;Now we have $m+1$ constraints, and know that $g(x)$ should be a $N = m$ order polynomial. So how do find $g(x)$?&lt;/p&gt;
+&lt;p&gt;The most straight forward way is to simply plug the constraints into $g(x)$. Doing this gives us the set of linear equations:&lt;/p&gt;
+
+
+
+\begin{align*}
+g(x_0) &amp;= c_0  + c_1 x_0 + c_2 x_0^2 + \dots + c_N x_0^{N} &amp;= y_0 \\
+g(x_1) &amp;= c_0  + c_1 x_1 + c_2 x_1^2 + \dots + c_N x_1^{N} &amp;= y_1 \\
+\vdots \\
+g(x_m) &amp;= c_0  + c_1 x_m + c_2 x_m^2 + \dots + c_N x_m^{N} &amp;= y_m \\
+\end{align*}
+
+&lt;p&gt;We turn this into a matrix problem that looks like:&lt;/p&gt;
+
+
+
+$$
+\begin{bmatrix}
+1  &amp;  x_0 &amp;  x_0^2 &amp; \dots &amp;  x_0^{N} \\[2pt]
+1  &amp;  x_1 &amp;  x_1^2 &amp; \dots &amp;  x_1^{N} \\[2pt]
+\vdots \\[2pt]
+1  &amp;  x_m &amp;  x_m^2 &amp; \dots &amp;  x_m^{N} \\[2pt]
+\end{bmatrix}
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots \\
+c_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+y_0 \\
+y_1 \\
+\vdots \\
+y_m \\
+\end{bmatrix}
+$$
+
+&lt;p&gt;The matrix above is known as a Vandermonde matrix. By solving this system, we find the coefficients $c_n$ that we can then reconstruct into $g(x) = \sum_{n=0}^N c_n x^n$.&lt;/p&gt;
+&lt;h2 id=&#34;for-arbitrary-function-basis&#34;&gt;For arbitrary function basis&lt;/h2&gt;
+&lt;p&gt;Remember that we chose $\phi_n(x) = x^n$, which are the monomial bases.
+This works fine, but the resulting problem is very difficult to solve computationally (it is &lt;a href=&#34;https://en.wikipedia.org/wiki/Condition_number&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;em&gt;ill-conditioned&lt;/em&gt;&lt;/a&gt;).
+Other choices of $\phi_n(x)$ can help reduce the difficulty significantly, such as the aforementioned Chebyshev polynomials.
+In fact, we don&amp;rsquo;t even need $\phi_n(x)$ to be defined by a polynomial.
+For example, we could choose the Fourier series (so $g(x) = c_0 + \sum_{n=1}^N c_n \cos(nx) + s_n \sin(nx)$).
+This is &lt;a href=&#34;#appendix-a-further-thoughts-on-non-polynomial-functions&#34;&gt;discussed in more detail below&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Regardless of the choice of your basis functions, there&amp;rsquo;s one primary question:
+&lt;strong&gt;How do we go about finding the interpolating function using other bases?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Answer: We create a different matrix to solve with.
+Recall that we defined $g(x) = \sum_{n=0}^N c_n \phi_n(x)$.
+Using an arbitrary $\phi_n(x)$ instead of the monomials $x^n$, we can apply each constraint, expand our definition of $g(x)$, and get the following system of equations:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+g(x_0) &amp;= c_0\phi_0(x_0)  + c_1 \phi_1(x_0) + \dots + c_N \phi_N(x_0) &amp;= y_0 \\
+g(x_1) &amp;= c_0\phi_0(x_1)  + c_1 \phi_1(x_1) + \dots + c_N \phi_N(x_1) &amp;= y_1 \\
+\vdots \\
+g(x_m) &amp;= c_0\phi_0(x_m)  + c_1 \phi_1(x_m) + \dots + c_N \phi_N(x_m) &amp;= y_m \\
+\end{align*}
+$$
+
+&lt;p&gt;This system of equation results in the matrix problem:
+
+
+
+$$
+\begin{bmatrix}
+\phi_0(x_0)  &amp; \phi_1(x_0) &amp; \dots &amp; \phi_N(x_0)\\
+\phi_0(x_1)  &amp; \phi_1(x_1) &amp; \dots &amp; \phi_N(x_1)\\
+\vdots \\
+\phi_0(x_m)  &amp; \phi_1(x_m) &amp; \dots &amp; \phi_N(x_m)\\
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots \\
+c_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+y_0 \\
+y_1 \\
+\vdots \\
+y_m \\
+\end{bmatrix}
+$$
+&lt;/p&gt;
+&lt;p&gt;Just as before, we can then solve this matrix problem, then reconstruct $g(x)$ using the coefficients $c_n$.&lt;/p&gt;
+&lt;h2 id=&#34;slope-constraints&#34;&gt;Slope constraints&lt;/h2&gt;
+&lt;p&gt;What if instead of wanting $g(x)$ to go through a specific point, we instead want the function to match a specific slope at a point? This is particularly useful for something like splines, where we want a smooth transition between one curve and another. Well, we can find a $g(x)$ that meets that constraint too!&lt;/p&gt;
+&lt;p&gt;First assume we replace the first interpolation constraint ($g(x_0) = y_0$) with a slope constraint ($g&amp;rsquo;(x_0) = s_0$), where $g&amp;rsquo; = \partial g / \partial x$.&lt;/p&gt;
+&lt;p&gt;Recall that we set $g(x) = \sum_{n=0}^N c_n \phi_n(x)$. To find $g&amp;rsquo;(x)$, we can simply take the derivative of sum expression:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+\frac{\partial}{\partial x} g(x) 
+&amp;= \frac{\partial}{\partial x} \left [c_0\phi_0(x)  + c_1 \phi_1(x) + \dots + c_N \phi_N(x) \right] \\
+&amp;= \frac{\partial}{\partial x} c_0\phi_0(x)  + \frac{\partial}{\partial x} c_1 \phi_1(x) + \dots + \frac{\partial}{\partial x} c_N \phi_N(x) \\[12pt]
+g&#39;(x) &amp;= c_0\phi&#39;_0(x)  + c_1 \phi&#39;_1(x) + \dots + c_N \phi&#39;_N(x)
+\end{align*}
+$$
+
+&lt;p&gt;So the derivative of $g(x)$ is just the sum of the derivatives of $\phi_n(x)$ weighted by the coefficients $c_n$. This is quite nice, as our function coefficients for $g(x)$ are the same as for $g&amp;rsquo;(x)$.&lt;/p&gt;
+&lt;p&gt;Using this result, we can write our slope constraint as:&lt;/p&gt;
+&lt;p&gt;$$g&amp;rsquo;(x_0) = c_0\phi_0&amp;rsquo;(x_0)  + c_1 \phi_1&amp;rsquo;(x_0) + \dots + c_N \phi_N&amp;rsquo;(x_0) = s_0$$&lt;/p&gt;
+&lt;p&gt;Recall that we replace our first interpolation constraint $g(x_0) = y_0$ with the slope constraint $g&amp;rsquo;(x_0) = s_0$. We can then replace the first equation in the linear system described above with $g&amp;rsquo;(x_0) = s_0$. This results in the matrix problem:
+
+
+
+$$
+\begin{bmatrix}
+\phi_0&#39;(x_0)  &amp; \phi_1&#39;(x_0) &amp; \dots &amp; \phi_N&#39;(x_0)\\
+\phi_0(x_1)  &amp; \phi_1(x_1) &amp; \dots &amp; \phi_N(x_1)\\
+\vdots \\
+\phi_0(x_m)  &amp; \phi_1(x_m) &amp; \dots &amp; \phi_N(x_m)\\
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots \\
+c_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+s_0 \\
+y_1 \\
+\vdots \\
+y_m \\
+\end{bmatrix}
+$$
+&lt;/p&gt;
+&lt;p&gt;This looks nearly identical to our pure-interpolation matrix problem! The only difference is that the first row of our matrix replaces $\phi_n \rightarrow \phi_n&amp;rsquo;$ and the first entry on the right hand side vector replaces $y_0 \rightarrow s_0$.&lt;/p&gt;
+&lt;p&gt;This last result is incredibly powerful. Using it, we can actually solve differential equations. This will be discussed in a later article.&lt;/p&gt;
+&lt;h2 id=&#34;appendix-a-further-thoughts-on-non-polynomial-functions&#34;&gt;Appendix A: Further thoughts on non-polynomial functions&lt;/h2&gt;
+&lt;p&gt;When using non-polynomials basis functions, terminology can change a bit, but the concepts are the same.&lt;/p&gt;
+&lt;h3 id=&#34;required-degrees-of-freedom-for-gx&#34;&gt;Required Degrees-of-freedom for $g(x)$&lt;/h3&gt;
+&lt;p&gt;For example, we stated that for $m+1$ constraints, we need an $m$th order polynomial.
+For non-polynomial basis function, we instead say that we need the number of degrees-of-freedom (DOFs) $N+1$ to equal the number of constraints $m+1$.
+For basis functions, the DOFs are the coefficients.
+Note this rule still applies to polynomials (a $N$th order polynomial has $N+1$ coefficients), but saying the order of the polynomial is more common-place and can be simpler to relate to the polynomial itself.&lt;/p&gt;
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Note that it may seem confusing to have both number of DOFs and number of constraints denoted as $X+1$ rather than simply $X$.
+This is due to the fact that conventionally the zero index for DOFs corresponds to the constant function, which is the 0th order polynomial.
+This convention often extends to non-polynomial functions as well (ie. Fourier series).
+We apply the same logic to the constraints to so that we can make simple statements like $N = m$ (which inherently means that $N+1 = m+1$).
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;non-linear-gx-with-respect-to-degrees-of-freedom&#34;&gt;Non-linear $g(x)$ with respect to degrees-of-freedom&lt;/h3&gt;
+&lt;p&gt;Also, note that we&amp;rsquo;ve restricted ourselves to function bases.
+This means that we can express $g(x)$ as a sum of those function bases times coefficients, which allows us to separate the coefficients away from the basis functions.
+However, we can work with expressions of $g(x)$ that are non-linear with respect to their degrees-of-freedom.
+An example of that is an alternate form of the Fourier series:&lt;/p&gt;
+&lt;p&gt;$$g(x) = \frac{c_0}{2} + \sum_{n=1}^N c_n \cos(2\pi n x + \psi_n)$$&lt;/p&gt;
+&lt;p&gt;Note that $\psi_n$ is a degrees-of-freedom for $g(x)$, but we can&amp;rsquo;t take it out of the sum; it&amp;rsquo;s inside the $\cos$ expression.
+This must be solved as a &lt;em&gt;non-linear equation&lt;/em&gt;, which can&amp;rsquo;t be expressed as a solution to a matrix problem.
+In order to solve this, you must express the problem in a residual form, and use a non-linear solver to find the solution.
+I&amp;rsquo;ll quickly cover the former, but not the latter.&lt;/p&gt;
+&lt;p&gt;First, I&amp;rsquo;ll denote $g(x)$ as $g(\mathbf c; x)$, to show that $g$ is a function of the $x$ function evaluation, but also the set of DOFs $\mathbf c$.
+To create the residual form, we form a system of equations of the form:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+g(\mathbf c; x_0) - y_0 &amp;= 0 \\
+g(\mathbf c; x_1) - y_1 &amp;= 0 \\
+\vdots \\
+g(\mathbf c; x_m) - y_m &amp;= 0 \\
+\end{align*}
+$$
+
+&lt;p&gt;Using this, we get the vector-valued residual function for this system:&lt;/p&gt;
+
+
+
+$$
+R\left(g(\mathbf c; x)\right) =
+R \left(
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots  \\
+c_N \\
+\end{bmatrix}
+\right)
+= 
+
+\begin{bmatrix}
+g(\mathbf c; x_0) - y_0\\
+g(\mathbf c; x_1) - y_1\\
+\vdots \\
+g(\mathbf c; x_m) - y_m\\
+\end{bmatrix}
+$$
+
+&lt;p&gt;The non-linear solve then finds the set of degrees-of-freedom such that $R(g(\mathbf c; x)) = \mathbf 0$.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Hybrid Turbulence Model Computations of the NASA Juncture Flow Model Using PHASTA</title>
+      <link>https://www.jameswright.xyz/publication/scitech_2020/</link>
+      <pubDate>Wed, 01 Jan 2020 00:00:00 +0000</pubDate>
+      <guid>https://www.jameswright.xyz/publication/scitech_2020/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

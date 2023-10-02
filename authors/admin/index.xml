@@ -1,0 +1,781 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>James Wright</title>
+    <link>https://www.jameswright.xyz/authors/admin/</link>
+      <atom:link href="https://www.jameswright.xyz/authors/admin/index.xml" rel="self" type="application/rss+xml" />
+    <description>James Wright</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright>
+    <image>
+      <url>https://www.jameswright.xyz/authors/admin/avatar_hu8685ca00ce77b7daa12767e3ee052ec4_1910556_270x270_fill_q90_lanczos_center.jpg</url>
+      <title>James Wright</title>
+      <link>https://www.jameswright.xyz/authors/admin/</link>
+    </image>
+    
+    <item>
+      <title>Calculate Wall Shear Gradient from Velocity Gradient</title>
+      <link>https://www.jameswright.xyz/post/20200813/calculate_wall_shear_from_velocity_gradient/</link>
+      <pubDate>Thu, 13 Aug 2020 09:49:47 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200813/calculate_wall_shear_from_velocity_gradient/</guid>
+      <description>&lt;p&gt;The gradient of velocity is generally easy to compute in most CFD
+post-processing routines. But let&amp;rsquo;s say you want to find the wall shear stress
+from this quantity, how would you do that? I&amp;rsquo;d been searching for an answer to
+this question and could never really find one (or at least one that was
+satisfying). Eventually I derived out the following solution and figured I&amp;rsquo;d
+post it so that the information was more widely available.&lt;/p&gt;
+&lt;h2 id=&#34;initial-definitions&#34;&gt;Initial Definitions&lt;/h2&gt;
+&lt;p&gt;First, let&amp;rsquo;s define more explicitly what we&amp;rsquo;re trying to find. The wall shear
+stress is often given as:&lt;/p&gt;
+&lt;p&gt;$$ \tau_w = \mu \left (\frac{\partial u}{\partial y}\right )
+\Bigg\rvert_{y=\text{wall}} $$&lt;/p&gt;
+&lt;p&gt;However, this isn&amp;rsquo;t very explicit and really only applies to flat plate
+boundary layer flows. I&amp;rsquo;d submit that the &amp;ldquo;real&amp;rdquo; definition is dynamic
+viscosity ($\mu$) times the wall-normal gradient of velocity tangential to the
+wall taken at the wall, or:&lt;/p&gt;
+&lt;p&gt;$$ \tau_w = \mu \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} $$&lt;/p&gt;
+&lt;p&gt;This will result in a vector parallel to the wall in the direction of the wall
+shear stress.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;ll define the velocity gradient as a tensor $E_{ij}\ $:&lt;/p&gt;
+&lt;p&gt;$$ E_{ij} = \frac{\partial u_i}{\partial x_j} = \partial_j u_i$$&lt;/p&gt;
+&lt;p&gt;Note that $E_{ij}$ is &lt;em&gt;not&lt;/em&gt; symmetric and that $\partial_j$ is still an
+operator with $u_i$ as it&amp;rsquo;s input, not multiplication.&lt;/p&gt;
+&lt;p&gt;Lastly, we have the common form of projecting a vector onto a plane given its
+normal vector:&lt;/p&gt;
+&lt;p&gt;$$ \text{proj}_{\hat n}(\overrightarrow{u}) = \overrightarrow{u} -
+(\overrightarrow{u} \cdot \hat n) \hat n
+= u_i - (u_j \hat n_j) \hat n_i$$&lt;/p&gt;
+&lt;p&gt;where $\hat n$ is the wall-normal unit vector. The right most term is in index
+summation notation.&lt;/p&gt;
+&lt;h2 id=&#34;preamble&#34;&gt;Preamble&lt;/h2&gt;
+&lt;h3 id=&#34;assumptions&#34;&gt;Assumptions&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;We have a wall-normal unit vector $\hat n_i$&lt;/li&gt;
+&lt;li&gt;We have the velocity gradient tensor $E_{ij} = \partial_j u_i$&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;goal&#34;&gt;Goal&lt;/h3&gt;
+&lt;p&gt;Obtain:&lt;/p&gt;
+&lt;p&gt;$$ \left (\frac{\partial u_\parallel}{\partial n}\right ) \Bigg\rvert_{n=0} =
+\left (\partial_{\hat n} u_\parallel\right ) \big\rvert_{n=0} =
+f(E_{ij}, \hat n) = f(\partial_j u_i, \hat n)$$&lt;/p&gt;
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+&lt;p&gt;For the impatient, the solution is:&lt;/p&gt;
+&lt;p&gt;$$ \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} = \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} = f(\hat n, E_{ij})$$&lt;/p&gt;
+&lt;p&gt;The derivation of the above equation is given below.&lt;/p&gt;
+&lt;h2 id=&#34;derivation&#34;&gt;Derivation&lt;/h2&gt;
+&lt;p&gt;Notice that the wall shear gradient can be broken into two &amp;ldquo;terms&amp;rdquo;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;gradient in the wall-normal direction&lt;/li&gt;
+&lt;li&gt;velocity tangent to the wall&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;First we&amp;rsquo;ll define these two &amp;ldquo;terms&amp;rdquo; individually&lt;/p&gt;
+&lt;h3 id=&#34;gradient-in-the-wall-normal-direction&#34;&gt;Gradient in the Wall-Normal Direction&lt;/h3&gt;
+&lt;p&gt;This is simply:&lt;/p&gt;
+&lt;p&gt;$$\hat n_j \partial_j$$&lt;/p&gt;
+&lt;p&gt;Gradient in a specific direction should result in a tensor whose rank is the
+same as it&amp;rsquo;s input. In other words, the gradient of a scalar in a single
+direction should result in a scalar (which is a rank 0 tensor). The summation
+over the $j$ index shows that this is true.&lt;/p&gt;
+&lt;h3 id=&#34;velocity-tangent-to-the-wall&#34;&gt;Velocity Tangent to the Wall&lt;/h3&gt;
+&lt;p&gt;Taking the vector projection formula from &lt;a href=&#34;#initial-definitions&#34;&gt;Initial
+Definitions&lt;/a&gt;, this is fairly straight forward:&lt;/p&gt;
+&lt;p&gt;$$ u_{i,\parallel} = u_i - (u_k \hat n_k) \hat n_i$$&lt;/p&gt;
+&lt;h3 id=&#34;combining-terms&#34;&gt;Combining Terms&lt;/h3&gt;
+&lt;p&gt;Putting these together, we get:&lt;/p&gt;
+&lt;p&gt;$$\underbrace{\hat n_j \partial_j}_{\partial_{\hat n}}
+[\underbrace{u_i - (u_k \hat n_k) \hat n_i }_{u_{\parallel}}]$$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \hat n_j \partial_j \left [u_k (\delta_{ik} - \hat n_k \hat n_i)
+\right]$$&lt;/p&gt;
+&lt;p&gt;Using product rule:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j \partial_j (u_k) +
+u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i)$$&lt;/p&gt;
+&lt;p&gt;First, let&amp;rsquo;s work with the right hand term (RHT):&lt;/p&gt;
+&lt;p&gt;$$ \text{RHT} = u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i) $$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_k \left [\hat n_j \partial_j (\delta_{ik}) - \hat n_j
+\partial_j (\hat n_k \hat n_i) \right ]$$&lt;/p&gt;
+&lt;p&gt;The Kronecker delta is invariant of spacial dimensions, so the left term goes to
+zero. Then we can do product rule again on the right term.&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_k \left [\hat n_j \cancelto{0}{\partial_j (\delta_{ik})} - \hat n_j
+\partial_j (\hat n_k \hat n_i)) \right ]$$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow -u_k  \left [\hat n_i \hat n_j \partial_j (\hat n_k) + \hat n_k
+\hat n_j \partial_j (\hat n_i) \right ]$$&lt;/p&gt;
+&lt;p&gt;Here, $\hat n$ is &lt;em&gt;not&lt;/em&gt; invariant of spacial location; if you have a non-flat
+surface, it will change as you move along the wall. However, note that $\hat
+n_j \partial_j$ is the gradient in the wall-normal direction. The $\hat n$
+does not change in the wall-normal direction; it only change in the
+wall-parallel direction. Thus:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow -u_k  \left [\hat n_i \cancelto{0}{\hat n_j \partial_j (\hat
+n_k)} + \hat n_k \cancelto{0}{\hat n_j \partial_j (\hat n_i)} \right ]$$&lt;/p&gt;
+&lt;p&gt;$$ \therefore \text{RHT} = 0 $$&lt;/p&gt;
+&lt;p&gt;Moving back to the original expression, we&amp;rsquo;re then left with:&lt;/p&gt;
+&lt;p&gt;$$ \partial_{\hat n} u_{i,\parallel} =  (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j \partial_j (u_k) +
+\cancelto{0}{u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i)}$$&lt;/p&gt;
+&lt;p&gt;Note that we already have the gradient of velocity in the last term, thus:&lt;/p&gt;
+&lt;p&gt;$$ \partial_{\hat n} u_{i,\parallel} =  (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j E_{kj} $$&lt;/p&gt;
+&lt;p&gt;$$ \therefore \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} = \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} = f(\hat n, E_{ij})$$&lt;/p&gt;
+&lt;p&gt;To obtain $\tau_w$, simply multiply by $\mu$:&lt;/p&gt;
+&lt;p&gt;$$\tau_w = \mu \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} $$&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Deriving Vorticity Transport in Index Notation</title>
+      <link>https://www.jameswright.xyz/post/20200722/vorticity_transport_index_notation/</link>
+      <pubDate>Wed, 22 Jul 2020 08:51:52 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200722/vorticity_transport_index_notation/</guid>
+      <description>&lt;h2 id=&#34;definitions-and-useful-tools&#34;&gt;Definitions and Useful Tools&lt;/h2&gt;
+&lt;h3 id=&#34;notation&#34;&gt;Notation&lt;/h3&gt;
+&lt;p&gt;The vorticity transport equation can simply be calculated by taking the curl of
+the conservation of momentum evolution equations. See my earlier post going
+over &lt;a href=&#34;https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/&#34;&gt;expressing curl in index summation notation&lt;/a&gt;. In summary, the
+curl of a vector $a_j$ can be expressed as:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times a_j  = b_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i a_j =
+b_k $$&lt;/p&gt;
+&lt;p&gt;where $\varepsilon_{ijk}$ is the &lt;a href=&#34;https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/#levi-civita-symbol&#34;&gt;Levi-Civita symbol&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Note that I&amp;rsquo;ll be using shorthand to express the differential operator,
+$\partial_\phi$, where the index $\phi$ is the index of a spacial variable
+&lt;em&gt;except&lt;/em&gt; for $t$, which represents a time derivative:&lt;/p&gt;
+&lt;p&gt;$$ \frac{\partial}{\partial x_i} = \partial_i \quad \mathrm{and} \quad
+\frac{\partial}{\partial t} = \partial_t$$&lt;/p&gt;
+&lt;p&gt;For double derivatives, a superscript will be used:&lt;/p&gt;
+&lt;p&gt;$$ \frac{\partial}{\partial x_i} \frac{\partial}{\partial x_i} =
+\frac{\partial^2}{\partial x_i^2} =
+\partial_i^2 $$&lt;/p&gt;
+&lt;h3 id=&#34;math-properties&#34;&gt;Math Properties&lt;/h3&gt;
+&lt;p&gt;Some useful properties of the Levi-Civita symbol that will be used are that it
+is commutative in multiplication and, since it is invariant of space and time,
+it can be brought in or outside a differential operator operator like a
+constant:&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{ijk}\frac{\partial}{\partial x_i} (\phi ) =
+\frac{\partial}{\partial x_i} (\varepsilon_{ijk} \phi ) $$&lt;/p&gt;
+&lt;p&gt;Using the &lt;a href=&#34;https://en.wikipedia.org/wiki/Levi-Civita_symbol#Product&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;product identity of permutation tensors
+&lt;/a&gt;, you can also
+convert permutation tensors into &lt;a href=&#34;https://en.wikipedia.org/wiki/Kronecker_delta&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Kronecker
+deltas&lt;/a&gt;, $\delta_{ij}$:&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{ijk} \varepsilon_{imn} = \delta_{jm}\delta_{kn} -
+\delta_{jn}\delta_{km} $$&lt;/p&gt;
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Hint: To convert from some arbitrary pair of Levi-Civita symbols that share
+one index, first rearrange their indices such that the shared index is the
+first for both. Then, the ordering of the Kronecker delta indices is $
+\delta_{a_2\  b_2} \delta_{a_3\  b_3} - \delta_{a_2\  b_3} \delta_{a_3\  b_2}$ ,
+where $a_i$ and $b_i$ represent the indices of the different Levi-Civita
+symbols and their subscripts represent which index is placed in that Kronecker
+delta.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Speaking of Kronecker deltas, they have the handy effect of changing indices:&lt;/p&gt;
+&lt;p&gt;$$ \delta_{ij} a_i = a_j $$&lt;/p&gt;
+&lt;p&gt;Differential operators are order invariant:&lt;/p&gt;
+&lt;p&gt;$$ \partial_i (\partial_j (u_k))  = \partial_j (\partial_i (u_k))$$&lt;/p&gt;
+&lt;div class=&#34;alert alert-warning&#34;&gt;
+  &lt;div&gt;
+    I will be dropping the use of parentheses for the
+differential operator, but note that it &lt;em&gt;is&lt;/em&gt; an operator and is not
+commutative: $\partial_i u_j \neq u_j \partial_i$
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;With that taken care of, onto the derivation!&lt;/p&gt;
+&lt;h2 id=&#34;curl-of-momentum-evolution&#34;&gt;Curl of Momentum Evolution&lt;/h2&gt;
+&lt;p&gt;The index notation form of the incompressible momentum evolution (or
+conservation of momentum equations) is:&lt;/p&gt;
+&lt;p&gt;$$ \partial_t u_i + u_j \partial_j u_i = - \tfrac{1}{\rho} \partial_i p +
+\nu \partial_j^2 u_i $$&lt;/p&gt;
+&lt;p&gt;Vorticity, $\omega_k$, is given as the curl of velocity, or:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times u_j  = \omega_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i u_j =
+\omega_k $$&lt;/p&gt;
+&lt;p&gt;To get vorticity evolution, we can take the curl of the momentum transport equations:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times [\partial_t u_i + u_j \partial_j u_i = -
+\tfrac{1}{\rho} \partial_i p + \nu \partial_j^2 u_i ]$$&lt;/p&gt;
+&lt;p&gt;In index notation, this is the equivalent of multiplying by the Levi-Civita
+symbol and a corresponding differential operator:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \varepsilon_{k\ell i} \partial_\ell [\partial_t u_i + u_j
+\partial_j u_i = - \tfrac{1}{\rho} \partial_i p + \nu \partial_j^2 u_i ]$$&lt;/p&gt;
+&lt;p&gt;Distributing this across the terms, we get:&lt;/p&gt;
+&lt;p&gt;$$ \begin{align}
+\underbrace{\varepsilon_{k\ell i} \partial_\ell
+\partial_t u_i}&lt;em&gt;\text{Temporal Term} +
+\underbrace{\varepsilon&lt;/em&gt;{k\ell i} \partial_\ell
+u_j \partial_j u_i}&lt;em&gt;\text{Advection Term} &amp;amp; =
+\underbrace{- \varepsilon&lt;/em&gt;{k\ell i} \partial_\ell
+\tfrac{1}{\rho} \partial_i p}&lt;em&gt;\text{Pressure Term} +
+\underbrace{\varepsilon&lt;/em&gt;{k\ell i} \partial_\ell
+\nu \partial_j^2 u_i}_\text{Viscous Term} \\
+\Rightarrow \quad \mathbb{T} + \mathbb{A} &amp;amp; = \mathbb{P} + \mathbb{V}
+\end{align}$$&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;ll treat the named terms individually, then put them back together. I&amp;rsquo;ll
+leave the advection term for last since it&amp;rsquo;s more involved than the other
+three.&lt;/p&gt;
+&lt;h2 id=&#34;individual-terms&#34;&gt;Individual Terms&lt;/h2&gt;
+&lt;h3 id=&#34;temporal-term-mathbbt&#34;&gt;Temporal Term $\mathbb{T}$&lt;/h3&gt;
+&lt;p&gt;$$\mathbb{T} = \varepsilon_{k\ell i} \partial_\ell \partial_t u_i $$&lt;/p&gt;
+&lt;p&gt;Using the order invariance of derivatives and moving $\varepsilon_{k\ell i}$
+inside the derivative operators, we can get the following:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad  \partial_t \varepsilon_{k\ell i} \partial_\ell u_i $$&lt;/p&gt;
+&lt;p&gt;Since we know that $\omega_k = \varepsilon_{k\ell i} \partial_\ell u_i$, then
+we can write:&lt;/p&gt;
+&lt;p&gt;$$\mathbb{T} = \partial_t \omega_k $$&lt;/p&gt;
+&lt;h3 id=&#34;pressure-term-mathbbp&#34;&gt;Pressure Term $\mathbb{P}$&lt;/h3&gt;
+&lt;p&gt;$$ \mathbb{P} = - \varepsilon_{k\ell i} \partial_\ell \tfrac{1}{\rho}
+\partial_i p $$&lt;/p&gt;
+&lt;p&gt;First we can move the density term out of the derivatives:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad - \tfrac{1}{\rho} \varepsilon_{k\ell i} \partial_\ell
+\partial_i p $$&lt;/p&gt;
+&lt;p&gt;The next step can go one of two ways. First you can simply use the fact that
+the curl of a gradient of a scalar equals zero ($\nabla \times (\partial_i
+\phi) = \mathbf{0}$). Or, you can be like me and want to prove that it is
+zero. I&amp;rsquo;ll probably do the former here, and put the latter in a separate post.
+Using the first method, we get that:&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{P} = \mathbf{0} $$&lt;/p&gt;
+&lt;h3 id=&#34;viscous-term-mathbbv&#34;&gt;Viscous Term $\mathbb{V}$&lt;/h3&gt;
+&lt;p&gt;$$ \mathbb{V} = \varepsilon_{k\ell i} \partial_\ell \nu \partial_j^2 u_i $$&lt;/p&gt;
+&lt;p&gt;This step is almost identical to the Temporal Term; rearrange the terms such
+that you have the curl of velocity in order to get vorticity:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad \nu \partial_j^2 \varepsilon_{k\ell i} \partial_\ell u_i $$&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad \mathbb{V} = \nu \partial_j^2 \omega_k $$&lt;/p&gt;
+&lt;h3 id=&#34;advection-term-mathbba&#34;&gt;Advection Term $\mathbb{A}$&lt;/h3&gt;
+&lt;p&gt;$$ \mathbb{A} = \varepsilon_{k\ell i} \partial_\ell u_j \partial_j u_i $$&lt;/p&gt;
+&lt;p&gt;This is quite a bit more tricky than the other three terms. Note that the
+derivatives are operators, so this maybe more explicitly written as:&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{A} = \varepsilon_{k\ell i} \partial_\ell (u_j \partial_j (u_i) ) $$&lt;/p&gt;
+&lt;p&gt;First, we&amp;rsquo;ll use a specialized property/rule:&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) + (\nabla \times
+u_n) \times u_q $$&lt;/p&gt;
+&lt;p&gt;This is proved in the &lt;a href=&#34;#appendix-a&#34;&gt;Appendix A&lt;/a&gt;. Converting the right term into
+index notation we get:&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) +
+\varepsilon_{ijq} u_q (\varepsilon_{jmn} \partial_m u_n)  $$&lt;/p&gt;
+&lt;p&gt;Notice that the term in parentheses on the right is already the curl of
+velocity, so we&amp;rsquo;ll go ahead and turn that into vorticity.&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) +
+\varepsilon_{ijq} \omega_j u_q $$&lt;/p&gt;
+&lt;p&gt;Plugging this back into our expression for $\mathbb{A}$, we get:&lt;/p&gt;
+&lt;p&gt;$$\mathbb{A} = \varepsilon_{k\ell i} \partial_\ell [\partial_i
+(\tfrac{1}{2} u_j u_j ) + \varepsilon_{ijq} \omega_j u_q  ] $$&lt;/p&gt;
+&lt;p&gt;Distributing this through, we get:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \varepsilon_{k\ell i} \partial_\ell [\partial_i (\tfrac{1}{2}
+u_j u_j ) ] + \varepsilon_{k\ell i} \partial_\ell [ \varepsilon_{ijq}
+\omega_j u_q ] $$&lt;/p&gt;
+&lt;p&gt;For the lefthand term, note that $u_j u_j$ is just a scalar. Therefore, the
+left expression can be surmised as the curl of the gradient of a scalar and it
+is then equal to zero. This leaves us with:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \mathbb{A} = \varepsilon_{k\ell i} \partial_\ell [
+\varepsilon_{ijq} \omega_j u_q ] $$&lt;/p&gt;
+&lt;p&gt;Now let&amp;rsquo;s move $\varepsilon_{ijq}$ outside the differential and change the
+indices of $\varepsilon_{k\ell i} \Rightarrow \varepsilon_{ik\ell}$: :&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \mathbb{A} = \varepsilon_{ik\ell} \varepsilon_{ijq}
+\partial_\ell \omega_j u_q$$&lt;/p&gt;
+&lt;p&gt;Since we have two Levi-Civita symbols, we can utilize the permutation tensor&amp;rsquo;s
+product identity shown in the &lt;a href=&#34;#math-properties&#34;&gt;Math Properties section&lt;/a&gt; to
+turn this into an expression of Kronecker deltas.&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{ik\ell} \varepsilon_{ijq} = \delta_{kj}\delta_{\ell q} -
+\delta_{kq}\delta_{\ell j} $$&lt;/p&gt;
+&lt;p&gt;which gives us&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{A} = (\delta_{kj}\delta_{\ell q} - \delta_{kq}\delta_{\ell j} )
+\partial_\ell \omega_j u_q $$&lt;/p&gt;
+&lt;p&gt;Using the Kronecker deltas to change indices yields:&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{A} = \partial_q \omega_k u_q - \partial_j \omega_j u_k $$&lt;/p&gt;
+&lt;p&gt;Next, use the product rule to expand the derivatives:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \ (u_q \partial_q \omega_k + \omega_k \partial_q  u_q) -
+( u_k \partial_j \omega_j  + \omega_j \partial_j  u_k)$$&lt;/p&gt;
+&lt;p&gt;By incompressibility $\partial_q u_q =0$ (ie. the divergence of velocity is
+zero). Also, $\partial_j \omega_j$ also equals zero, which is proven in
+&lt;a href=&#34;#appendix-b&#34;&gt;Appendix B&lt;/a&gt;. Substituting in we are left with:&lt;/p&gt;
+&lt;p&gt;$$ (u_q \partial_q \omega_k + 0) - ( 0  + \omega_j \partial_j  u_k) $$&lt;/p&gt;
+&lt;p&gt;And thus we &lt;em&gt;finally&lt;/em&gt; get the final form of the advection term:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \  \mathbb{A} = \underbrace{u_q \partial_q
+\omega_k}_\text{Vorticity Advection}  - \underbrace{\omega_j \partial_j
+u_k}_\text{Vorticity Stretching} $$&lt;/p&gt;
+&lt;h2 id=&#34;putting-it-all-together&#34;&gt;Putting It All Together&lt;/h2&gt;
+&lt;p&gt;When we combine the terms together, we finally get the full vorticity transport
+equation:&lt;/p&gt;
+&lt;p&gt;$$
+\underbrace{\partial_t \omega_k}_\mathbb{T}  +
+\underbrace{u_q \partial_q \omega_k  - \omega_j \partial_j u_k}_\mathbb{A} =
+\underbrace{0}_\mathbb{P} +
+\underbrace{\nu \partial_j^2 \omega_k}_\mathbb{V}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;appendix&#34;&gt;Appendix&lt;/h2&gt;
+&lt;h3 id=&#34;appendix-a&#34;&gt;Appendix A&lt;/h3&gt;
+&lt;p&gt;Prove: $$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) + (\nabla
+\times u_n) \times u_q $$&lt;/p&gt;
+&lt;p&gt;Starting with the righthand side, put in index notation:&lt;/p&gt;
+&lt;p&gt;$$\partial_i (\tfrac{1}{2} u_j u_j ) + \varepsilon_{ijq} u_q
+(\varepsilon_{jmn} \partial_m u_n) $$&lt;/p&gt;
+&lt;p&gt;Take the right term and rearrange it:
+$$ &amp;hellip; + \varepsilon_{jqi} \varepsilon_{jmn} u_q  \partial_m u_n $$&lt;/p&gt;
+&lt;p&gt;Convert the product of Levi-Civita symbols to Kronecker deltas:&lt;/p&gt;
+&lt;p&gt;$$ &amp;hellip; + (\delta_{qm} \delta_{in} - \delta_{qn}\delta_{im} ) u_q  \partial_m
+u_n $$&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \ &amp;hellip; + u_m  \partial_m u_i  - u_n  \partial_i u_n $$&lt;/p&gt;
+&lt;p&gt;Change dummy indices in each term to match (for aesthetics):&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \tfrac{1}{2} \partial_i (u_j u_j) + u_j  \partial_j
+u_i  - u_j  \partial_i u_j $$&lt;/p&gt;
+&lt;p&gt;Using product rule, we have $\partial_i (u_j u_j) = u_j \partial_i u_j + u_j
+\partial_i u_j = 2 u_j \partial_i u_j $.  Substituting this in yields:&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_i u_j + u_j  \partial_j u_i  - u_j  \partial_i u_j $$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_j \partial_j u_i $$&lt;/p&gt;
+&lt;h3 id=&#34;appendix-b&#34;&gt;Appendix B&lt;/h3&gt;
+&lt;p&gt;Prove:
+$$\partial_j \omega_j = 0$$&lt;/p&gt;
+&lt;p&gt;Revert vorticity back to it&amp;rsquo;s original definition:&lt;/p&gt;
+&lt;p&gt;$$\partial_j \varepsilon_{jik} \partial_i u_k \Rightarrow
+\varepsilon_{jik} \partial_j \partial_i u_k $$&lt;/p&gt;
+&lt;p&gt;Since the permutation tensor is antisymmetric in its indices,
+$\varepsilon_{jik} = -\varepsilon_{ijk}$.&lt;/p&gt;
+&lt;p&gt;$$\varepsilon_{jik} \partial_j \partial_i u_k = - \varepsilon_{ijk} \partial_j
+\partial_i u_k $$&lt;/p&gt;
+&lt;p&gt;Since all the indices are dummy indices, they maybe changed/switched
+arbitrarily. Let&amp;rsquo;s switch the $j$ and $i$ indices:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \varepsilon_{jik} \partial_j \partial_i u_k = -
+\varepsilon_{jik} \partial_i \partial_j u_k $$&lt;/p&gt;
+&lt;p&gt;Additionally, the derivatives are order invariant, so we can rearrange them:&lt;/p&gt;
+&lt;p&gt;$$\varepsilon_{jik} \partial_j \partial_i u_k = - \varepsilon_{jik} \partial_j
+\partial_i u_k $$&lt;/p&gt;
+&lt;p&gt;This is only possible if $\varepsilon_{jik} \partial_j \partial_i u_k = 0$. Thus:&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{jik} \partial_j \partial_i u_k  =  \partial_j \omega_j = 0$$&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Cross Product and Curl in Index Notation</title>
+      <link>https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/</link>
+      <pubDate>Tue, 21 Jul 2020 18:00:45 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/</guid>
+      <description>&lt;p&gt;Here are some brief notes on performing a cross-product using index notation.
+This requires use of the &lt;a href=&#34;https://en.wikipedia.org/wiki/Levi-Civita_symbol&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Levi-Civita
+symbol&lt;/a&gt;, which may also be
+called the permutation tensor.&lt;/p&gt;
+&lt;h2 id=&#34;levi-civita-symbol&#34;&gt;Levi-Civita Symbol&lt;/h2&gt;
+&lt;p&gt;The Levi-Civita symbol is often expressed using an $\varepsilon$ and takes the
+following definition:&lt;/p&gt;
+&lt;p&gt;$$  \varepsilon_{ijk} =
+\begin{cases}
++1 &amp;amp; \text{if } (i,j,k) \text{ is even permutation,} \\
+-1 &amp;amp; \text{if } (i,j,k) \text{ is odd permutation,} \\
+0 &amp;amp; \text{if } i = j, \text{ or } j = k, \text{ or } k = i
+\end{cases}
+$$&lt;/p&gt;
+&lt;p&gt;For a 3D system, the definition of an odd or even permutation can be shown in
+&lt;a href=&#34;#figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg&#34;&gt;Figure 1&lt;/a&gt;.&lt;/p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  id=&#34;figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg&#34;&gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./Permutation_indices_3d_numerical_edit.png&#34; alt=&#34;Permutation pattern for Levi-Civita symbol in 3D. [Altered from source.](https://commons.wikimedia.org/wiki/File:Permutation_indices_3d_numerical.svg)&#34; loading=&#34;lazy&#34; data-zoomable width=&#34;50%&#34; /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;figcaption data-pre=&#34;Figure&amp;nbsp;&#34; data-post=&#34;:&amp;nbsp;&#34; class=&#34;numbered&#34;&gt;
+      Permutation pattern for Levi-Civita symbol in 3D. &lt;a href=&#34;https://commons.wikimedia.org/wiki/File:Permutation_indices_3d_numerical.svg&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Altered from source.&lt;/a&gt;
+    &lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;The permutation is even if the three numbers of the index are in &amp;ldquo;order&amp;rdquo;, given
+allowance to cycle back through the numbers once the end is reached. So if you
+skip to the 1 value in the index, going left-to-right should be in numerical
+order. For example, if given 321 and starting with the 1 we get 1 $\rightarrow$
+3 $\rightarrow$ 2. 132 is not in numerical order, thus it is an odd permutation.&lt;/p&gt;
+&lt;p&gt;So given $\varepsilon_{ijk}\,$, if $i$, $j$, and $k$ are $123$, $231$, or $312$,
+then $\varepsilon_{ijk}=1$. Note that the order of the indicies matter. If
+instead we&amp;rsquo;re given $\varepsilon_{jik}$ and any of the three permutations in
+the previous example, then the expression would be equal to $-1$ instead.&lt;/p&gt;
+&lt;h2 id=&#34;cross-products-in-index-notation&#34;&gt;Cross Products in Index Notation&lt;/h2&gt;
+&lt;p&gt;Now we get to the implementation of cross products. This involves transitioning
+back and forth from vector notation to index notation. A vector and it&amp;rsquo;s index
+notation equivalent are given as:&lt;/p&gt;
+&lt;p&gt;$$ \mathbf{a} = a_i$$&lt;/p&gt;
+&lt;p&gt;If we want to take the cross product of this with a vector $\mathbf{b} = b_j$,
+we get:&lt;/p&gt;
+&lt;p&gt;$$ \mathbf{a} \times \mathbf{b}  = a_i \times b_j \ \Rightarrow  &lt;br&gt;
+\varepsilon_{ijk} a_i b_j = c_k$$&lt;/p&gt;
+&lt;p&gt;Note the indices, where the resulting vector $c_k$ inherits the index not used
+by the original vectors. Also note that since the cross product is
+anticommutative (ie. $\mathbf{a} \times \mathbf{b} = - \mathbf{b} \times
+\mathbf{a}$ ), changing the order of the vectors being crossed requires
+changing the indices of the Levi-Civita symbol or adding a negative:&lt;/p&gt;
+&lt;p&gt;$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j =
+-\varepsilon_{ijk} a_i b_j = c_k$$&lt;/p&gt;
+&lt;p&gt;Conversely, the commutativity of multiplication (which is valid in index
+notation) means that the vector order &lt;em&gt;can&lt;/em&gt; be changed without changing the
+permutation symbol indices or anything else:&lt;/p&gt;
+&lt;p&gt;$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j  =
+\varepsilon_{jik} b_j a_i$$&lt;/p&gt;
+&lt;h3 id=&#34;rules-of-thumb-for-setting-indices-correctly&#34;&gt;Rule(s) of Thumb for Setting Indices Correctly&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Start the indices of the permutation symbol with the index of the resulting
+vector.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This will often be the free index of the equation that
+the cross product lives in and I normally like to have the free index as the
+leading index in multi-index terms.&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;The next two indices need to be in the same order as the vectors from the
+cross product.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Using these rules, say we want to replicate $a_\ell \times b_k = c_j$. Then the
+first index needs to be $j$ since $c_j$ is the resulting vector. The other 2
+indices must be $\ell$ and $k$ then. This results in:&lt;/p&gt;
+&lt;p&gt;$$ a_\ell \times b_k = c_j \quad \Rightarrow \quad \varepsilon_{j\ell k} a_\ell
+b_k = c_j$$&lt;/p&gt;
+&lt;h2 id=&#34;curl-in-index-notation&#34;&gt;Curl in Index Notation&lt;/h2&gt;
+&lt;p&gt;The curl is given as the cross product of the gradient and some vector field:&lt;/p&gt;
+&lt;p&gt;$$ \mathrm{curl}({a_j}) = \nabla \times a_j  = b_k $$&lt;/p&gt;
+&lt;p&gt;In index notation, this would be given as:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times a_j  = b_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i a_j =
+b_k $$&lt;/p&gt;
+&lt;p&gt;where $\partial_i$ is the differential operator $\frac{\partial}{\partial
+x_i}$.&lt;/p&gt;
+&lt;div class=&#34;alert alert-warning&#34;&gt;
+  &lt;div&gt;
+    Note that $\partial_k$ is &lt;em&gt;&lt;strong&gt;not&lt;/strong&gt;&lt;/em&gt; commutative since it is an operator. It may be
+better to write $\partial_k u_i$ as $\partial_k (u_i)$ to more explicitly
+denote it&amp;rsquo;s nature as an operator on $u_i$.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;These follow the same rules as with a normal cross product, but the
+first &amp;ldquo;vector&amp;rdquo; is always going to be the differential operator. Since $\nabla$
+is hardly ever defined with an index, the &lt;a href=&#34;#rules-of-thumb-for-setting-indices-correctly&#34;&gt;rule of
+thumb&lt;/a&gt; can come in handy when
+trying to translate vector notation curl into index notation.&lt;/p&gt;
+&lt;p&gt;For example, if I have a vector $u_i$ and I want to take the curl of it, first
+I need to decide what I want the resulting vector index to be. Let&amp;rsquo;s make it be
+$\ell$.  Due to index summation rules, the index we assign to the differential
+operator may be any character that isn&amp;rsquo;t $i$ or $\ell$ in our case. Let&amp;rsquo;s make
+it be $k$. Putting that all together we get:&lt;/p&gt;
+&lt;p&gt;$$ \mathrm{curl}(u_i) = \varepsilon_{\ell ki} \partial_k u_i = \omega_\ell $$&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Automate Deployment of Wowchemy Website onto GitHub Pages</title>
+      <link>https://www.jameswright.xyz/post/20200409/deploy_wowchemy_to_githubio/</link>
+      <pubDate>Thu, 09 Apr 2020 20:04:51 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200409/deploy_wowchemy_to_githubio/</guid>
+      <description>&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Hugo Academic theme has now changed it&amp;rsquo;s name to Wowchemy.  I&amp;rsquo;ve updated the
+names and links in the post to reflect the change.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;alert alert-warning&#34;&gt;
+  &lt;div&gt;
+    &lt;p&gt;This tutorial will assume that&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;You have a repository containing the Wowchemy source code&lt;/li&gt;
+&lt;li&gt;You have a GitHub Pages repository&lt;/li&gt;
+&lt;li&gt;You have a general grasp of GitHub and git concepts (repos, pushing, etc.)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Resources for creating your Wowchemy website can be found at the &lt;a href=&#34;https://wowchemy.com/docs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wowchemy
+website&lt;/a&gt;. For setting up your own (free) GitHub
+Pages repository, see the &lt;a href=&#34;https://pages.github.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub Pages Website&lt;/a&gt;. If
+you have neither of these pre-requisites done, go get them done and come back
+here.  Don&amp;rsquo;t worry, I can wait. 😉&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;tldr&#34;&gt;tl;dr&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Copy and edit &lt;a href=&#34;#github-action-workflow&#34;&gt;Workflow YAML file&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Put Workflow YAML file in &lt;code&gt;.github/workflows/&lt;/code&gt; directory in Source repo&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#generate-personal-access-token&#34;&gt;Create personal access token&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#create-secret-in-source-repository&#34;&gt;Store personal access token in secret in Source repo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Push Source repo (with the Workflow YAML file)&lt;/li&gt;
+&lt;li&gt;Watch GitHub do all the work for you&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    &lt;p&gt;I talk about two primary repositories in this tutorial: a &amp;ldquo;Source&amp;rdquo; repo and a
+&amp;ldquo;Pages&amp;rdquo; repo.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Source Repo&lt;/strong&gt;: Contains the Hugo source files (markdown, config, etc.)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pages Repo&lt;/strong&gt;: The directory from which a GitHub Pages website is deployed&lt;/li&gt;
+&lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This tutorial goes over how to take a website built using Wowchemy and
+host that website using a GitHub Pages website. This website you&amp;rsquo;re viewing
+right now is run using this exact process. The beauty of hosting it on GitHub
+Pages is that:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;It is free&lt;/li&gt;
+&lt;li&gt;You can setup a custom domain name with it easily&lt;/li&gt;
+&lt;li&gt;It integrates well with automated deployment&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;By default, GH Pages will suggest you use Jekyll for creating the website. I
+have nothing against using Jekyll to build a website, but the Wowchemy
+theme is great for, well, academics and researchers.&lt;/p&gt;
+&lt;p&gt;The way GitHub Pages sites work is that, assuming Jekyll files are not present,
+they will simply display any static website that is present in the repository.
+Thus, if we take the static site files that Hugo generates and then place them
+in the Pages repository, voila! We have a Hugo site deployed on GH Pages.&lt;/p&gt;
+&lt;p&gt;Technically you could do this process manually; on your local machine generate
+the static site files in the Hugo Source repository, copy them to the GH Pages
+repository, and &lt;code&gt;git push&lt;/code&gt; that. But that&amp;rsquo;s a hassle &lt;em&gt;and&lt;/em&gt; there&amp;rsquo;s a better
+way: GitHub Actions.&lt;/p&gt;
+&lt;p&gt;Using GitHub Actions (GitHub&amp;rsquo;s flavor of CI/CD automation), we can automate the
+process as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Push local changes to your Source repo&amp;rsquo;s &lt;code&gt;master&lt;/code&gt; branch&lt;/li&gt;
+&lt;li&gt;A GitHub Action Workflow will then:
+&lt;ol&gt;
+&lt;li&gt;Clone the Source repo&lt;/li&gt;
+&lt;li&gt;Build the Hugo website&lt;/li&gt;
+&lt;li&gt;Clone the GH Pages repo&lt;/li&gt;
+&lt;li&gt;Copy the static site files from Source repo to Pages repo&lt;/li&gt;
+&lt;li&gt;Push those changes to the Source repo&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;GitHub Pages publishes the static files that were pushed to the Pages repo&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;github-action-workflow&#34;&gt;GitHub Action Workflow&lt;/h2&gt;
+&lt;p&gt;So how do we do this? Well it all relies on GitHub Actions to do all the work.
+We use GitHub Actions by defining a Workflow in the form of a &lt;code&gt;yaml&lt;/code&gt; file in
+the &lt;code&gt;.github/workflows&lt;/code&gt; directory of the repository. For our present use case,
+the file looks like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Build and Deploy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;on&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;push&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;branches&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      - &lt;span style=&#34;color:#ae81ff&#34;&gt;master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;jobs&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;build&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;runs-on&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Checkout master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;actions/checkout@v1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;with&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;submodules&lt;/span&gt;: &lt;span style=&#34;color:#66d9ef&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Hugo Deploy GitHub Pages&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;benmatselby/hugo-deploy-gh-pages@master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;env&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;HUGO_VERSION&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;0.68.3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TARGET_REPO&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;jrwrigh/jrwrigh.github.io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TOKEN&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;${{ secrets.TOKEN }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;CNAME&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;www.jameswright.xyz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;I&amp;rsquo;ll go over the different parts, but you can find more details about GitHub
+Actions &lt;a href=&#34;https://help.github.com/en/actions/getting-started-with-github-actions&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub Documentation
+here&lt;/a&gt;
+and about the syntax of the Workflow &lt;code&gt;yaml&lt;/code&gt; file
+&lt;a href=&#34;https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;name&#34;&gt;Name&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Build and Deploy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This is simply the name of the GitHub Workflow that you&amp;rsquo;re going to make. This is
+what will show up in the GitHub Workflows dashboard of the repository.&lt;/p&gt;
+&lt;h3 id=&#34;trigger&#34;&gt;Trigger&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;on&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;push&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;branches&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      - &lt;span style=&#34;color:#ae81ff&#34;&gt;master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This tells GitHub when to run the Workflow. Here, we want it to trigger on a push
+to the master branch.&lt;/p&gt;
+&lt;h3 id=&#34;build-job&#34;&gt;Build Job&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;jobs&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;build&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;runs-on&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This section starts the declaration of what the Workflow should actually do.
+A Workflow is made up of individual &lt;code&gt;jobs&lt;/code&gt;. Here, we only need one job: &lt;code&gt;build&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;First, the operating system is specified for the &lt;code&gt;build&lt;/code&gt; job. The proceeding
+steps rely on access to &lt;code&gt;apt-get&lt;/code&gt; to install the required software to build the
+static site files, so Ubuntu is chosen.&lt;/p&gt;
+&lt;p&gt;After this, the &lt;code&gt;steps&lt;/code&gt; for the &lt;code&gt;build&lt;/code&gt; job are listed. These are what define
+what the job actually does. These steps can be defined different ways, but
+we&amp;rsquo;re going to be using only Actions. Actions are just predefined scripts that
+are published on GitHub&amp;rsquo;s marketplace (though you can reference unpublished
+ones if they&amp;rsquo;re in a public repository).&lt;/p&gt;
+&lt;h3 id=&#34;checkout-action&#34;&gt;Checkout Action&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Checkout master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;actions/checkout@v1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;with&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;submodules&lt;/span&gt;: &lt;span style=&#34;color:#66d9ef&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This simply clones (or checkout in GitHub&amp;rsquo;s nomenclature) the Source repository
+to the container. It is one of GitHub&amp;rsquo;s default actions.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; The &lt;code&gt;submodules: true&lt;/code&gt; is quite important, as the Wowchemy theme
+runs as a submodule in your Source repository. If that wasn&amp;rsquo;t set, Hugo
+wouldn&amp;rsquo;t be able to build the site.&lt;/p&gt;
+&lt;h3 id=&#34;build-and-deploy-action&#34;&gt;Build and Deploy Action&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Hugo Deploy GitHub Pages&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;benmatselby/hugo-deploy-gh-pages@master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;env&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;HUGO_VERSION&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;0.68.3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TARGET_REPO&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;jrwrigh/jrwrigh.github.io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TOKEN&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;${{ secrets.TOKEN }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;CNAME&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;www.jameswright.xyz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And here is where the magic happens. To actually deploy the Hugo site to the
+GitHub Pages repository, we use &lt;a href=&#34;https://benmatselby.dev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ben Selby&lt;/a&gt;&amp;rsquo;s &lt;a href=&#34;https://github.com/benmatselby/hugo-deploy-gh-pages/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hugo
+Deployment GitHub
+Action&lt;/a&gt;. This will:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;build the Hugo site,&lt;/li&gt;
+&lt;li&gt;clone the GH Pages repository,&lt;/li&gt;
+&lt;li&gt;copy the static site files to the Pages repository, and&lt;/li&gt;
+&lt;li&gt;finally push those changes.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There are a few options for this Action, which are all set with environment
+variables (hence the &lt;code&gt;env:&lt;/code&gt;). In detail, the options are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;HUGO_VERSION&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;Version of Hugo used to build the website&lt;/li&gt;
+&lt;li&gt;Can usually just be set to whatever version you use on your local machine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TARGET_REPO&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;The repository were the static site files should be copied/pushed to.&lt;/li&gt;
+&lt;li&gt;This would be the Pages repository, in the format of &lt;code&gt;[User]/[Repository Name]&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TOKEN&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;The GitHub personal access token (PAT) for your Pages repository to push changes.&lt;/li&gt;
+&lt;li&gt;Further discussed in the &lt;a href=&#34;#secret-token-setup&#34;&gt;Secret Token Setup&lt;/a&gt; section.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CNAME&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;The contents of this variable are copied into a file called &lt;code&gt;CNAME&lt;/code&gt; and
+placed in the Pages repo.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;CNAME&lt;/code&gt; file is used if you setup a custom domain name for your website.&lt;/li&gt;
+&lt;li&gt;See &lt;a href=&#34;https://help.github.com/en/github/working-with-github-pages/configuring-a-custom-domain-for-your-github-pages-site&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub documentation&lt;/a&gt;
+for more info on custom domain names for GitHub Pages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;secret-token-setup&#34;&gt;Secret Token Setup&lt;/h2&gt;
+&lt;p&gt;In order to push to the GH Pages repository, the GitHub Action needs to have
+appropriate credentials. This is done through a personal access token (PAT),
+which is a cryptographic key that can be used instead of login credentials for
+performing user-restricted operations on a remote repository (such as &lt;code&gt;git push&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Since this replaces login information, it&amp;rsquo;s probably obvious that the PAT is
+very sensitive for privacy reasons. So to allow GitHub Actions to have access
+to this token without having it publicly published, we store it as a &amp;ldquo;secret&amp;rdquo;
+in the Source repo.&lt;/p&gt;
+&lt;h3 id=&#34;generate-personal-access-token&#34;&gt;Generate Personal Access Token&lt;/h3&gt;
+&lt;p&gt;Detailed documentation for generating a personal access token (PAT) for
+yourself can be &lt;a href=&#34;https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;found
+here&lt;/a&gt;.
+I recommend following the steps listed in the documentation to generate the
+PAT. To make the PAT valid for our purposes, you need to set the access
+settings to be full for the repositories as seen in the image below:&lt;/p&gt;
+&lt;p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  &gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./token-settings.png&#34; alt=&#34;Settings for Token Setup&#34; loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Once you hit generate, keep an eye on the alphanumeric string that is
+displayed. That&amp;rsquo;s the PAT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  &gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./copy-token.png&#34; alt=&#34;Copy Token&#34; loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Copy this string somewhere safe for right now. Once the PAT is put into a
+secret and you&amp;rsquo;ve verified that everything works, I&amp;rsquo;d recommend you &lt;em&gt;&lt;strong&gt;don&amp;rsquo;t&lt;/strong&gt;&lt;/em&gt;
+store the key anywhere. If for whatever reason you end up needing a PAT later,
+it&amp;rsquo;s easy to create a new one.&lt;/p&gt;
+&lt;h3 id=&#34;create-secret-in-source-repository&#34;&gt;Create Secret in Source Repository&lt;/h3&gt;
+&lt;p&gt;Now that we have the PAT, we need to let the GH Action have access to it via
+the Source repo&amp;rsquo;s secrets. I recommend following GitHub&amp;rsquo;s documentation on
+&lt;a href=&#34;https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;creating a secret for GitHub
+Actions&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The secret creation screen looks like this, where &amp;ldquo;Value&amp;rdquo; is where you copy
+your PAT to:&lt;/p&gt;
+&lt;p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  &gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./secret-setup.png&#34; alt=&#34;GitHub Repository Secret creation setup&#34; loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Note that the name setup above must be the same as that used in the Workflow
+&lt;code&gt;yaml&lt;/code&gt; script:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TOKEN&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;${{ secrets.EXAMPLE_TOKEN }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping Up&lt;/h2&gt;
+&lt;p&gt;Now that you have your secret token setup and your Workflow YAML file
+in place, you&amp;rsquo;re all set for auto-publishing. Your Hugo site on GitHub Pages.&lt;/p&gt;
+&lt;p&gt;If you find any inaccurate information on the page, feel free to hit the &amp;ldquo;Edit
+Page&amp;rdquo; command below and submit a pull request with updates. If you have any
+questions about getting this setup, feel free to contact me. I&amp;rsquo;m not an expert
+by any means, but I&amp;rsquo;ll do my best.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

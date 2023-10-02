@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Authors | James Wright</title>
+    <link>https://www.jameswright.xyz/authors/</link>
+      <atom:link href="https://www.jameswright.xyz/authors/index.xml" rel="self" type="application/rss+xml" />
+    <description>Authors</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright><lastBuildDate>Tue, 28 Mar 2023 09:22:48 -0600</lastBuildDate>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_huda118e9b915acb252802967a5464c294_334187_512x512_fill_lanczos_center_3.png</url>
+      <title>Authors</title>
+      <link>https://www.jameswright.xyz/authors/</link>
+    </image>
+    
+  </channel>
+</rss>

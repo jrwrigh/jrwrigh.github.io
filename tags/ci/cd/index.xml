@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CI/CD | James Wright</title>
+    <link>https://www.jameswright.xyz/tags/ci/cd/</link>
+      <atom:link href="https://www.jameswright.xyz/tags/ci/cd/index.xml" rel="self" type="application/rss+xml" />
+    <description>CI/CD</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_huda118e9b915acb252802967a5464c294_334187_512x512_fill_lanczos_center_3.png</url>
+      <title>CI/CD</title>
+      <link>https://www.jameswright.xyz/tags/ci/cd/</link>
+    </image>
+    
+    <item>
+      <title>Automate Deployment of Wowchemy Website onto GitHub Pages</title>
+      <link>https://www.jameswright.xyz/post/20200409/deploy_wowchemy_to_githubio/</link>
+      <pubDate>Thu, 09 Apr 2020 20:04:51 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200409/deploy_wowchemy_to_githubio/</guid>
+      <description>&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Hugo Academic theme has now changed it&amp;rsquo;s name to Wowchemy.  I&amp;rsquo;ve updated the
+names and links in the post to reflect the change.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;alert alert-warning&#34;&gt;
+  &lt;div&gt;
+    &lt;p&gt;This tutorial will assume that&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;You have a repository containing the Wowchemy source code&lt;/li&gt;
+&lt;li&gt;You have a GitHub Pages repository&lt;/li&gt;
+&lt;li&gt;You have a general grasp of GitHub and git concepts (repos, pushing, etc.)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Resources for creating your Wowchemy website can be found at the &lt;a href=&#34;https://wowchemy.com/docs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wowchemy
+website&lt;/a&gt;. For setting up your own (free) GitHub
+Pages repository, see the &lt;a href=&#34;https://pages.github.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub Pages Website&lt;/a&gt;. If
+you have neither of these pre-requisites done, go get them done and come back
+here.  Don&amp;rsquo;t worry, I can wait. 😉&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;tldr&#34;&gt;tl;dr&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Copy and edit &lt;a href=&#34;#github-action-workflow&#34;&gt;Workflow YAML file&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Put Workflow YAML file in &lt;code&gt;.github/workflows/&lt;/code&gt; directory in Source repo&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#generate-personal-access-token&#34;&gt;Create personal access token&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#create-secret-in-source-repository&#34;&gt;Store personal access token in secret in Source repo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Push Source repo (with the Workflow YAML file)&lt;/li&gt;
+&lt;li&gt;Watch GitHub do all the work for you&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    &lt;p&gt;I talk about two primary repositories in this tutorial: a &amp;ldquo;Source&amp;rdquo; repo and a
+&amp;ldquo;Pages&amp;rdquo; repo.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Source Repo&lt;/strong&gt;: Contains the Hugo source files (markdown, config, etc.)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pages Repo&lt;/strong&gt;: The directory from which a GitHub Pages website is deployed&lt;/li&gt;
+&lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This tutorial goes over how to take a website built using Wowchemy and
+host that website using a GitHub Pages website. This website you&amp;rsquo;re viewing
+right now is run using this exact process. The beauty of hosting it on GitHub
+Pages is that:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;It is free&lt;/li&gt;
+&lt;li&gt;You can setup a custom domain name with it easily&lt;/li&gt;
+&lt;li&gt;It integrates well with automated deployment&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;By default, GH Pages will suggest you use Jekyll for creating the website. I
+have nothing against using Jekyll to build a website, but the Wowchemy
+theme is great for, well, academics and researchers.&lt;/p&gt;
+&lt;p&gt;The way GitHub Pages sites work is that, assuming Jekyll files are not present,
+they will simply display any static website that is present in the repository.
+Thus, if we take the static site files that Hugo generates and then place them
+in the Pages repository, voila! We have a Hugo site deployed on GH Pages.&lt;/p&gt;
+&lt;p&gt;Technically you could do this process manually; on your local machine generate
+the static site files in the Hugo Source repository, copy them to the GH Pages
+repository, and &lt;code&gt;git push&lt;/code&gt; that. But that&amp;rsquo;s a hassle &lt;em&gt;and&lt;/em&gt; there&amp;rsquo;s a better
+way: GitHub Actions.&lt;/p&gt;
+&lt;p&gt;Using GitHub Actions (GitHub&amp;rsquo;s flavor of CI/CD automation), we can automate the
+process as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Push local changes to your Source repo&amp;rsquo;s &lt;code&gt;master&lt;/code&gt; branch&lt;/li&gt;
+&lt;li&gt;A GitHub Action Workflow will then:
+&lt;ol&gt;
+&lt;li&gt;Clone the Source repo&lt;/li&gt;
+&lt;li&gt;Build the Hugo website&lt;/li&gt;
+&lt;li&gt;Clone the GH Pages repo&lt;/li&gt;
+&lt;li&gt;Copy the static site files from Source repo to Pages repo&lt;/li&gt;
+&lt;li&gt;Push those changes to the Source repo&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;GitHub Pages publishes the static files that were pushed to the Pages repo&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;github-action-workflow&#34;&gt;GitHub Action Workflow&lt;/h2&gt;
+&lt;p&gt;So how do we do this? Well it all relies on GitHub Actions to do all the work.
+We use GitHub Actions by defining a Workflow in the form of a &lt;code&gt;yaml&lt;/code&gt; file in
+the &lt;code&gt;.github/workflows&lt;/code&gt; directory of the repository. For our present use case,
+the file looks like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Build and Deploy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;on&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;push&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;branches&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      - &lt;span style=&#34;color:#ae81ff&#34;&gt;master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;jobs&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;build&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;runs-on&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Checkout master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;actions/checkout@v1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;with&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;submodules&lt;/span&gt;: &lt;span style=&#34;color:#66d9ef&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Hugo Deploy GitHub Pages&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;benmatselby/hugo-deploy-gh-pages@master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;env&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;HUGO_VERSION&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;0.68.3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TARGET_REPO&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;jrwrigh/jrwrigh.github.io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TOKEN&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;${{ secrets.TOKEN }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;CNAME&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;www.jameswright.xyz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;I&amp;rsquo;ll go over the different parts, but you can find more details about GitHub
+Actions &lt;a href=&#34;https://help.github.com/en/actions/getting-started-with-github-actions&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub Documentation
+here&lt;/a&gt;
+and about the syntax of the Workflow &lt;code&gt;yaml&lt;/code&gt; file
+&lt;a href=&#34;https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;name&#34;&gt;Name&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Build and Deploy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This is simply the name of the GitHub Workflow that you&amp;rsquo;re going to make. This is
+what will show up in the GitHub Workflows dashboard of the repository.&lt;/p&gt;
+&lt;h3 id=&#34;trigger&#34;&gt;Trigger&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;on&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;push&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;branches&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      - &lt;span style=&#34;color:#ae81ff&#34;&gt;master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This tells GitHub when to run the Workflow. Here, we want it to trigger on a push
+to the master branch.&lt;/p&gt;
+&lt;h3 id=&#34;build-job&#34;&gt;Build Job&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;jobs&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;build&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;runs-on&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This section starts the declaration of what the Workflow should actually do.
+A Workflow is made up of individual &lt;code&gt;jobs&lt;/code&gt;. Here, we only need one job: &lt;code&gt;build&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;First, the operating system is specified for the &lt;code&gt;build&lt;/code&gt; job. The proceeding
+steps rely on access to &lt;code&gt;apt-get&lt;/code&gt; to install the required software to build the
+static site files, so Ubuntu is chosen.&lt;/p&gt;
+&lt;p&gt;After this, the &lt;code&gt;steps&lt;/code&gt; for the &lt;code&gt;build&lt;/code&gt; job are listed. These are what define
+what the job actually does. These steps can be defined different ways, but
+we&amp;rsquo;re going to be using only Actions. Actions are just predefined scripts that
+are published on GitHub&amp;rsquo;s marketplace (though you can reference unpublished
+ones if they&amp;rsquo;re in a public repository).&lt;/p&gt;
+&lt;h3 id=&#34;checkout-action&#34;&gt;Checkout Action&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Checkout master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;actions/checkout@v1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;with&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;submodules&lt;/span&gt;: &lt;span style=&#34;color:#66d9ef&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This simply clones (or checkout in GitHub&amp;rsquo;s nomenclature) the Source repository
+to the container. It is one of GitHub&amp;rsquo;s default actions.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; The &lt;code&gt;submodules: true&lt;/code&gt; is quite important, as the Wowchemy theme
+runs as a submodule in your Source repository. If that wasn&amp;rsquo;t set, Hugo
+wouldn&amp;rsquo;t be able to build the site.&lt;/p&gt;
+&lt;h3 id=&#34;build-and-deploy-action&#34;&gt;Build and Deploy Action&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Hugo Deploy GitHub Pages&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;uses&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;benmatselby/hugo-deploy-gh-pages@master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;env&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;HUGO_VERSION&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;0.68.3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TARGET_REPO&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;jrwrigh/jrwrigh.github.io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TOKEN&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;${{ secrets.TOKEN }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;CNAME&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;www.jameswright.xyz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And here is where the magic happens. To actually deploy the Hugo site to the
+GitHub Pages repository, we use &lt;a href=&#34;https://benmatselby.dev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ben Selby&lt;/a&gt;&amp;rsquo;s &lt;a href=&#34;https://github.com/benmatselby/hugo-deploy-gh-pages/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hugo
+Deployment GitHub
+Action&lt;/a&gt;. This will:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;build the Hugo site,&lt;/li&gt;
+&lt;li&gt;clone the GH Pages repository,&lt;/li&gt;
+&lt;li&gt;copy the static site files to the Pages repository, and&lt;/li&gt;
+&lt;li&gt;finally push those changes.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There are a few options for this Action, which are all set with environment
+variables (hence the &lt;code&gt;env:&lt;/code&gt;). In detail, the options are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;HUGO_VERSION&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;Version of Hugo used to build the website&lt;/li&gt;
+&lt;li&gt;Can usually just be set to whatever version you use on your local machine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TARGET_REPO&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;The repository were the static site files should be copied/pushed to.&lt;/li&gt;
+&lt;li&gt;This would be the Pages repository, in the format of &lt;code&gt;[User]/[Repository Name]&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TOKEN&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;The GitHub personal access token (PAT) for your Pages repository to push changes.&lt;/li&gt;
+&lt;li&gt;Further discussed in the &lt;a href=&#34;#secret-token-setup&#34;&gt;Secret Token Setup&lt;/a&gt; section.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CNAME&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;The contents of this variable are copied into a file called &lt;code&gt;CNAME&lt;/code&gt; and
+placed in the Pages repo.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;CNAME&lt;/code&gt; file is used if you setup a custom domain name for your website.&lt;/li&gt;
+&lt;li&gt;See &lt;a href=&#34;https://help.github.com/en/github/working-with-github-pages/configuring-a-custom-domain-for-your-github-pages-site&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub documentation&lt;/a&gt;
+for more info on custom domain names for GitHub Pages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;secret-token-setup&#34;&gt;Secret Token Setup&lt;/h2&gt;
+&lt;p&gt;In order to push to the GH Pages repository, the GitHub Action needs to have
+appropriate credentials. This is done through a personal access token (PAT),
+which is a cryptographic key that can be used instead of login credentials for
+performing user-restricted operations on a remote repository (such as &lt;code&gt;git push&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Since this replaces login information, it&amp;rsquo;s probably obvious that the PAT is
+very sensitive for privacy reasons. So to allow GitHub Actions to have access
+to this token without having it publicly published, we store it as a &amp;ldquo;secret&amp;rdquo;
+in the Source repo.&lt;/p&gt;
+&lt;h3 id=&#34;generate-personal-access-token&#34;&gt;Generate Personal Access Token&lt;/h3&gt;
+&lt;p&gt;Detailed documentation for generating a personal access token (PAT) for
+yourself can be &lt;a href=&#34;https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;found
+here&lt;/a&gt;.
+I recommend following the steps listed in the documentation to generate the
+PAT. To make the PAT valid for our purposes, you need to set the access
+settings to be full for the repositories as seen in the image below:&lt;/p&gt;
+&lt;p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  &gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./token-settings.png&#34; alt=&#34;Settings for Token Setup&#34; loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Once you hit generate, keep an eye on the alphanumeric string that is
+displayed. That&amp;rsquo;s the PAT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  &gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./copy-token.png&#34; alt=&#34;Copy Token&#34; loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Copy this string somewhere safe for right now. Once the PAT is put into a
+secret and you&amp;rsquo;ve verified that everything works, I&amp;rsquo;d recommend you &lt;em&gt;&lt;strong&gt;don&amp;rsquo;t&lt;/strong&gt;&lt;/em&gt;
+store the key anywhere. If for whatever reason you end up needing a PAT later,
+it&amp;rsquo;s easy to create a new one.&lt;/p&gt;
+&lt;h3 id=&#34;create-secret-in-source-repository&#34;&gt;Create Secret in Source Repository&lt;/h3&gt;
+&lt;p&gt;Now that we have the PAT, we need to let the GH Action have access to it via
+the Source repo&amp;rsquo;s secrets. I recommend following GitHub&amp;rsquo;s documentation on
+&lt;a href=&#34;https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;creating a secret for GitHub
+Actions&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The secret creation screen looks like this, where &amp;ldquo;Value&amp;rdquo; is where you copy
+your PAT to:&lt;/p&gt;
+&lt;p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  &gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./secret-setup.png&#34; alt=&#34;GitHub Repository Secret creation setup&#34; loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Note that the name setup above must be the same as that used in the Workflow
+&lt;code&gt;yaml&lt;/code&gt; script:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;TOKEN&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;${{ secrets.EXAMPLE_TOKEN }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping Up&lt;/h2&gt;
+&lt;p&gt;Now that you have your secret token setup and your Workflow YAML file
+in place, you&amp;rsquo;re all set for auto-publishing. Your Hugo site on GitHub Pages.&lt;/p&gt;
+&lt;p&gt;If you find any inaccurate information on the page, feel free to hit the &amp;ldquo;Edit
+Page&amp;rdquo; command below and submit a pull request with updates. If you have any
+questions about getting this setup, feel free to contact me. I&amp;rsquo;m not an expert
+by any means, but I&amp;rsquo;ll do my best.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
