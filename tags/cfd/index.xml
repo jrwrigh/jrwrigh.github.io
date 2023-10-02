@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CFD | James Wright</title>
+    <link>https://www.jameswright.xyz/tags/cfd/</link>
+      <atom:link href="https://www.jameswright.xyz/tags/cfd/index.xml" rel="self" type="application/rss+xml" />
+    <description>CFD</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright><lastBuildDate>Thu, 13 Aug 2020 09:49:47 -0600</lastBuildDate>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_huda118e9b915acb252802967a5464c294_334187_512x512_fill_lanczos_center_3.png</url>
+      <title>CFD</title>
+      <link>https://www.jameswright.xyz/tags/cfd/</link>
+    </image>
+    
+    <item>
+      <title>Calculate Wall Shear Gradient from Velocity Gradient</title>
+      <link>https://www.jameswright.xyz/post/20200813/calculate_wall_shear_from_velocity_gradient/</link>
+      <pubDate>Thu, 13 Aug 2020 09:49:47 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200813/calculate_wall_shear_from_velocity_gradient/</guid>
+      <description>&lt;p&gt;The gradient of velocity is generally easy to compute in most CFD
+post-processing routines. But let&amp;rsquo;s say you want to find the wall shear stress
+from this quantity, how would you do that? I&amp;rsquo;d been searching for an answer to
+this question and could never really find one (or at least one that was
+satisfying). Eventually I derived out the following solution and figured I&amp;rsquo;d
+post it so that the information was more widely available.&lt;/p&gt;
+&lt;h2 id=&#34;initial-definitions&#34;&gt;Initial Definitions&lt;/h2&gt;
+&lt;p&gt;First, let&amp;rsquo;s define more explicitly what we&amp;rsquo;re trying to find. The wall shear
+stress is often given as:&lt;/p&gt;
+&lt;p&gt;$$ \tau_w = \mu \left (\frac{\partial u}{\partial y}\right )
+\Bigg\rvert_{y=\text{wall}} $$&lt;/p&gt;
+&lt;p&gt;However, this isn&amp;rsquo;t very explicit and really only applies to flat plate
+boundary layer flows. I&amp;rsquo;d submit that the &amp;ldquo;real&amp;rdquo; definition is dynamic
+viscosity ($\mu$) times the wall-normal gradient of velocity tangential to the
+wall taken at the wall, or:&lt;/p&gt;
+&lt;p&gt;$$ \tau_w = \mu \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} $$&lt;/p&gt;
+&lt;p&gt;This will result in a vector parallel to the wall in the direction of the wall
+shear stress.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;ll define the velocity gradient as a tensor $E_{ij}\ $:&lt;/p&gt;
+&lt;p&gt;$$ E_{ij} = \frac{\partial u_i}{\partial x_j} = \partial_j u_i$$&lt;/p&gt;
+&lt;p&gt;Note that $E_{ij}$ is &lt;em&gt;not&lt;/em&gt; symmetric and that $\partial_j$ is still an
+operator with $u_i$ as it&amp;rsquo;s input, not multiplication.&lt;/p&gt;
+&lt;p&gt;Lastly, we have the common form of projecting a vector onto a plane given its
+normal vector:&lt;/p&gt;
+&lt;p&gt;$$ \text{proj}_{\hat n}(\overrightarrow{u}) = \overrightarrow{u} -
+(\overrightarrow{u} \cdot \hat n) \hat n
+= u_i - (u_j \hat n_j) \hat n_i$$&lt;/p&gt;
+&lt;p&gt;where $\hat n$ is the wall-normal unit vector. The right most term is in index
+summation notation.&lt;/p&gt;
+&lt;h2 id=&#34;preamble&#34;&gt;Preamble&lt;/h2&gt;
+&lt;h3 id=&#34;assumptions&#34;&gt;Assumptions&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;We have a wall-normal unit vector $\hat n_i$&lt;/li&gt;
+&lt;li&gt;We have the velocity gradient tensor $E_{ij} = \partial_j u_i$&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;goal&#34;&gt;Goal&lt;/h3&gt;
+&lt;p&gt;Obtain:&lt;/p&gt;
+&lt;p&gt;$$ \left (\frac{\partial u_\parallel}{\partial n}\right ) \Bigg\rvert_{n=0} =
+\left (\partial_{\hat n} u_\parallel\right ) \big\rvert_{n=0} =
+f(E_{ij}, \hat n) = f(\partial_j u_i, \hat n)$$&lt;/p&gt;
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+&lt;p&gt;For the impatient, the solution is:&lt;/p&gt;
+&lt;p&gt;$$ \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} = \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} = f(\hat n, E_{ij})$$&lt;/p&gt;
+&lt;p&gt;The derivation of the above equation is given below.&lt;/p&gt;
+&lt;h2 id=&#34;derivation&#34;&gt;Derivation&lt;/h2&gt;
+&lt;p&gt;Notice that the wall shear gradient can be broken into two &amp;ldquo;terms&amp;rdquo;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;gradient in the wall-normal direction&lt;/li&gt;
+&lt;li&gt;velocity tangent to the wall&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;First we&amp;rsquo;ll define these two &amp;ldquo;terms&amp;rdquo; individually&lt;/p&gt;
+&lt;h3 id=&#34;gradient-in-the-wall-normal-direction&#34;&gt;Gradient in the Wall-Normal Direction&lt;/h3&gt;
+&lt;p&gt;This is simply:&lt;/p&gt;
+&lt;p&gt;$$\hat n_j \partial_j$$&lt;/p&gt;
+&lt;p&gt;Gradient in a specific direction should result in a tensor whose rank is the
+same as it&amp;rsquo;s input. In other words, the gradient of a scalar in a single
+direction should result in a scalar (which is a rank 0 tensor). The summation
+over the $j$ index shows that this is true.&lt;/p&gt;
+&lt;h3 id=&#34;velocity-tangent-to-the-wall&#34;&gt;Velocity Tangent to the Wall&lt;/h3&gt;
+&lt;p&gt;Taking the vector projection formula from &lt;a href=&#34;#initial-definitions&#34;&gt;Initial
+Definitions&lt;/a&gt;, this is fairly straight forward:&lt;/p&gt;
+&lt;p&gt;$$ u_{i,\parallel} = u_i - (u_k \hat n_k) \hat n_i$$&lt;/p&gt;
+&lt;h3 id=&#34;combining-terms&#34;&gt;Combining Terms&lt;/h3&gt;
+&lt;p&gt;Putting these together, we get:&lt;/p&gt;
+&lt;p&gt;$$\underbrace{\hat n_j \partial_j}_{\partial_{\hat n}}
+[\underbrace{u_i - (u_k \hat n_k) \hat n_i }_{u_{\parallel}}]$$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \hat n_j \partial_j \left [u_k (\delta_{ik} - \hat n_k \hat n_i)
+\right]$$&lt;/p&gt;
+&lt;p&gt;Using product rule:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j \partial_j (u_k) +
+u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i)$$&lt;/p&gt;
+&lt;p&gt;First, let&amp;rsquo;s work with the right hand term (RHT):&lt;/p&gt;
+&lt;p&gt;$$ \text{RHT} = u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i) $$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_k \left [\hat n_j \partial_j (\delta_{ik}) - \hat n_j
+\partial_j (\hat n_k \hat n_i) \right ]$$&lt;/p&gt;
+&lt;p&gt;The Kronecker delta is invariant of spacial dimensions, so the left term goes to
+zero. Then we can do product rule again on the right term.&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_k \left [\hat n_j \cancelto{0}{\partial_j (\delta_{ik})} - \hat n_j
+\partial_j (\hat n_k \hat n_i)) \right ]$$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow -u_k  \left [\hat n_i \hat n_j \partial_j (\hat n_k) + \hat n_k
+\hat n_j \partial_j (\hat n_i) \right ]$$&lt;/p&gt;
+&lt;p&gt;Here, $\hat n$ is &lt;em&gt;not&lt;/em&gt; invariant of spacial location; if you have a non-flat
+surface, it will change as you move along the wall. However, note that $\hat
+n_j \partial_j$ is the gradient in the wall-normal direction. The $\hat n$
+does not change in the wall-normal direction; it only change in the
+wall-parallel direction. Thus:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow -u_k  \left [\hat n_i \cancelto{0}{\hat n_j \partial_j (\hat
+n_k)} + \hat n_k \cancelto{0}{\hat n_j \partial_j (\hat n_i)} \right ]$$&lt;/p&gt;
+&lt;p&gt;$$ \therefore \text{RHT} = 0 $$&lt;/p&gt;
+&lt;p&gt;Moving back to the original expression, we&amp;rsquo;re then left with:&lt;/p&gt;
+&lt;p&gt;$$ \partial_{\hat n} u_{i,\parallel} =  (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j \partial_j (u_k) +
+\cancelto{0}{u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i)}$$&lt;/p&gt;
+&lt;p&gt;Note that we already have the gradient of velocity in the last term, thus:&lt;/p&gt;
+&lt;p&gt;$$ \partial_{\hat n} u_{i,\parallel} =  (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j E_{kj} $$&lt;/p&gt;
+&lt;p&gt;$$ \therefore \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} = \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} = f(\hat n, E_{ij})$$&lt;/p&gt;
+&lt;p&gt;To obtain $\tau_w$, simply multiply by $\mu$:&lt;/p&gt;
+&lt;p&gt;$$\tau_w = \mu \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} $$&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

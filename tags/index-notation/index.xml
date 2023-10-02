@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>index notation | James Wright</title>
+    <link>https://www.jameswright.xyz/tags/index-notation/</link>
+      <atom:link href="https://www.jameswright.xyz/tags/index-notation/index.xml" rel="self" type="application/rss+xml" />
+    <description>index notation</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright><lastBuildDate>Tue, 21 Jul 2020 18:00:45 -0600</lastBuildDate>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_huda118e9b915acb252802967a5464c294_334187_512x512_fill_lanczos_center_3.png</url>
+      <title>index notation</title>
+      <link>https://www.jameswright.xyz/tags/index-notation/</link>
+    </image>
+    
+    <item>
+      <title>Cross Product and Curl in Index Notation</title>
+      <link>https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/</link>
+      <pubDate>Tue, 21 Jul 2020 18:00:45 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/</guid>
+      <description>&lt;p&gt;Here are some brief notes on performing a cross-product using index notation.
+This requires use of the &lt;a href=&#34;https://en.wikipedia.org/wiki/Levi-Civita_symbol&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Levi-Civita
+symbol&lt;/a&gt;, which may also be
+called the permutation tensor.&lt;/p&gt;
+&lt;h2 id=&#34;levi-civita-symbol&#34;&gt;Levi-Civita Symbol&lt;/h2&gt;
+&lt;p&gt;The Levi-Civita symbol is often expressed using an $\varepsilon$ and takes the
+following definition:&lt;/p&gt;
+&lt;p&gt;$$  \varepsilon_{ijk} =
+\begin{cases}
++1 &amp;amp; \text{if } (i,j,k) \text{ is even permutation,} \\
+-1 &amp;amp; \text{if } (i,j,k) \text{ is odd permutation,} \\
+0 &amp;amp; \text{if } i = j, \text{ or } j = k, \text{ or } k = i
+\end{cases}
+$$&lt;/p&gt;
+&lt;p&gt;For a 3D system, the definition of an odd or even permutation can be shown in
+&lt;a href=&#34;#figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg&#34;&gt;Figure 1&lt;/a&gt;.&lt;/p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  id=&#34;figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg&#34;&gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./Permutation_indices_3d_numerical_edit.png&#34; alt=&#34;Permutation pattern for Levi-Civita symbol in 3D. [Altered from source.](https://commons.wikimedia.org/wiki/File:Permutation_indices_3d_numerical.svg)&#34; loading=&#34;lazy&#34; data-zoomable width=&#34;50%&#34; /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;figcaption data-pre=&#34;Figure&amp;nbsp;&#34; data-post=&#34;:&amp;nbsp;&#34; class=&#34;numbered&#34;&gt;
+      Permutation pattern for Levi-Civita symbol in 3D. &lt;a href=&#34;https://commons.wikimedia.org/wiki/File:Permutation_indices_3d_numerical.svg&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Altered from source.&lt;/a&gt;
+    &lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;The permutation is even if the three numbers of the index are in &amp;ldquo;order&amp;rdquo;, given
+allowance to cycle back through the numbers once the end is reached. So if you
+skip to the 1 value in the index, going left-to-right should be in numerical
+order. For example, if given 321 and starting with the 1 we get 1 $\rightarrow$
+3 $\rightarrow$ 2. 132 is not in numerical order, thus it is an odd permutation.&lt;/p&gt;
+&lt;p&gt;So given $\varepsilon_{ijk}\,$, if $i$, $j$, and $k$ are $123$, $231$, or $312$,
+then $\varepsilon_{ijk}=1$. Note that the order of the indicies matter. If
+instead we&amp;rsquo;re given $\varepsilon_{jik}$ and any of the three permutations in
+the previous example, then the expression would be equal to $-1$ instead.&lt;/p&gt;
+&lt;h2 id=&#34;cross-products-in-index-notation&#34;&gt;Cross Products in Index Notation&lt;/h2&gt;
+&lt;p&gt;Now we get to the implementation of cross products. This involves transitioning
+back and forth from vector notation to index notation. A vector and it&amp;rsquo;s index
+notation equivalent are given as:&lt;/p&gt;
+&lt;p&gt;$$ \mathbf{a} = a_i$$&lt;/p&gt;
+&lt;p&gt;If we want to take the cross product of this with a vector $\mathbf{b} = b_j$,
+we get:&lt;/p&gt;
+&lt;p&gt;$$ \mathbf{a} \times \mathbf{b}  = a_i \times b_j \ \Rightarrow  &lt;br&gt;
+\varepsilon_{ijk} a_i b_j = c_k$$&lt;/p&gt;
+&lt;p&gt;Note the indices, where the resulting vector $c_k$ inherits the index not used
+by the original vectors. Also note that since the cross product is
+anticommutative (ie. $\mathbf{a} \times \mathbf{b} = - \mathbf{b} \times
+\mathbf{a}$ ), changing the order of the vectors being crossed requires
+changing the indices of the Levi-Civita symbol or adding a negative:&lt;/p&gt;
+&lt;p&gt;$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j =
+-\varepsilon_{ijk} a_i b_j = c_k$$&lt;/p&gt;
+&lt;p&gt;Conversely, the commutativity of multiplication (which is valid in index
+notation) means that the vector order &lt;em&gt;can&lt;/em&gt; be changed without changing the
+permutation symbol indices or anything else:&lt;/p&gt;
+&lt;p&gt;$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j  =
+\varepsilon_{jik} b_j a_i$$&lt;/p&gt;
+&lt;h3 id=&#34;rules-of-thumb-for-setting-indices-correctly&#34;&gt;Rule(s) of Thumb for Setting Indices Correctly&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Start the indices of the permutation symbol with the index of the resulting
+vector.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This will often be the free index of the equation that
+the cross product lives in and I normally like to have the free index as the
+leading index in multi-index terms.&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;The next two indices need to be in the same order as the vectors from the
+cross product.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Using these rules, say we want to replicate $a_\ell \times b_k = c_j$. Then the
+first index needs to be $j$ since $c_j$ is the resulting vector. The other 2
+indices must be $\ell$ and $k$ then. This results in:&lt;/p&gt;
+&lt;p&gt;$$ a_\ell \times b_k = c_j \quad \Rightarrow \quad \varepsilon_{j\ell k} a_\ell
+b_k = c_j$$&lt;/p&gt;
+&lt;h2 id=&#34;curl-in-index-notation&#34;&gt;Curl in Index Notation&lt;/h2&gt;
+&lt;p&gt;The curl is given as the cross product of the gradient and some vector field:&lt;/p&gt;
+&lt;p&gt;$$ \mathrm{curl}({a_j}) = \nabla \times a_j  = b_k $$&lt;/p&gt;
+&lt;p&gt;In index notation, this would be given as:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times a_j  = b_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i a_j =
+b_k $$&lt;/p&gt;
+&lt;p&gt;where $\partial_i$ is the differential operator $\frac{\partial}{\partial
+x_i}$.&lt;/p&gt;
+&lt;div class=&#34;alert alert-warning&#34;&gt;
+  &lt;div&gt;
+    Note that $\partial_k$ is &lt;em&gt;&lt;strong&gt;not&lt;/strong&gt;&lt;/em&gt; commutative since it is an operator. It may be
+better to write $\partial_k u_i$ as $\partial_k (u_i)$ to more explicitly
+denote it&amp;rsquo;s nature as an operator on $u_i$.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;These follow the same rules as with a normal cross product, but the
+first &amp;ldquo;vector&amp;rdquo; is always going to be the differential operator. Since $\nabla$
+is hardly ever defined with an index, the &lt;a href=&#34;#rules-of-thumb-for-setting-indices-correctly&#34;&gt;rule of
+thumb&lt;/a&gt; can come in handy when
+trying to translate vector notation curl into index notation.&lt;/p&gt;
+&lt;p&gt;For example, if I have a vector $u_i$ and I want to take the curl of it, first
+I need to decide what I want the resulting vector index to be. Let&amp;rsquo;s make it be
+$\ell$.  Due to index summation rules, the index we assign to the differential
+operator may be any character that isn&amp;rsquo;t $i$ or $\ell$ in our case. Let&amp;rsquo;s make
+it be $k$. Putting that all together we get:&lt;/p&gt;
+&lt;p&gt;$$ \mathrm{curl}(u_i) = \varepsilon_{\ell ki} \partial_k u_i = \omega_\ell $$&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

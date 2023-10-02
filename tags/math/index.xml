@@ -1,0 +1,1075 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>math | James Wright</title>
+    <link>https://www.jameswright.xyz/tags/math/</link>
+      <atom:link href="https://www.jameswright.xyz/tags/math/index.xml" rel="self" type="application/rss+xml" />
+    <description>math</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright> This work by James Wright is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+Permissions beyond the scope of this license may be available at james@jameswright.xyz.</copyright><lastBuildDate>Sun, 25 Sep 2022 11:34:16 -0600</lastBuildDate>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_huda118e9b915acb252802967a5464c294_334187_512x512_fill_lanczos_center_3.png</url>
+      <title>math</title>
+      <link>https://www.jameswright.xyz/tags/math/</link>
+    </image>
+    
+    <item>
+      <title>Collocation Methods from Interpolation</title>
+      <link>https://www.jameswright.xyz/post/20220925/collocation-methods-from-interpolation/</link>
+      <pubDate>Sun, 25 Sep 2022 11:34:16 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20220925/collocation-methods-from-interpolation/</guid>
+      <description>&lt;details class=&#34;toc-inpage d-print-none  &#34; open&gt;
+  &lt;summary class=&#34;font-weight-bold&#34;&gt;Table of Contents&lt;/summary&gt;
+  &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#intro&#34;&gt;Intro&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#interpolation-fundamentals&#34;&gt;Interpolation Fundamentals&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#collocation-overview&#34;&gt;Collocation Overview&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#collocation-for-a-generic-differential-equation&#34;&gt;Collocation for a Generic Differential Equation&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#defining-the-solution-function&#34;&gt;Defining the Solution Function&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#defining-the-constraints&#34;&gt;Defining the Constraints&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#determining-the-collocation-points&#34;&gt;Determining the Collocation Points&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#creating-the-system-of-equations&#34;&gt;Creating the System of Equations&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#matrix-form&#34;&gt;Matrix Form&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#residual-form&#34;&gt;Residual form&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#example-pde-poisson&#34;&gt;Example PDE: Poisson&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#creating-the-system-of-equations-1&#34;&gt;Creating the System of Equations&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#appendix-a-determining-collocation-points-continued&#34;&gt;Appendix A: Determining Collocation Points Continued&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#how-many&#34;&gt;How many?&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#where-should-the-collocation-points-be-located&#34;&gt;Where should the collocation points be located?&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/details&gt;
+&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
+&lt;p&gt;Collocation methods are a way of approximately solving differential equations (both partial and ordinary).
+They are very simple to code and implement.&lt;/p&gt;
+&lt;p&gt;This article will cover collocation methods as an extension of simple interpolation. If you&amp;rsquo;re not familiar with interpolation theory, see &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/&#34;&gt;&lt;strong&gt;Interpolation Theory 101&lt;/strong&gt;&lt;/a&gt;.
+Even if you are, I&amp;rsquo;ll give a quick rundown of the parts of interpolation theory that you&amp;rsquo;ll need for this article:&lt;/p&gt;
+&lt;h2 id=&#34;interpolation-fundamentals&#34;&gt;Interpolation Fundamentals&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;We want to find a function $g(x)$ such that it meets a set of $m+1$ constraints $g(x_i) = y_i$&lt;/li&gt;
+&lt;li&gt;We assume $g(x)$ to be of the form $g(x) = \sum_{i=0}^N c_i  \phi_i(x)$ &lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/li&gt;
+&lt;li&gt;To ensure existence and uniqueness of the solution, we prescribe that the number of degrees-of-freedom (DOFs) $N+1$ equals the number of constraints $m+1$&lt;/li&gt;
+&lt;li&gt;Expanding $g(x)$ for each constraint results in a system of equations with $N+1$ DOFs and $m+1$ equations.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Normal interpolation sets constraints on the value of the function $g$ itself.
+I also introduced &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#slope-constraints&#34;&gt;slope constraints&lt;/a&gt;, which sets a constraint on the slope of the polynomial rather than the polynomial itself.&lt;/p&gt;
+&lt;p&gt;Collocation is a further continuation of that; &lt;strong&gt;we set the constraint(s) that the function must satisfy a differential equation at select locations&lt;/strong&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;collocation-overview&#34;&gt;Collocation Overview&lt;/h2&gt;
+&lt;p&gt;In collocation, we&amp;rsquo;re doing the exact same procedure as in interpolation, but with different constraints.
+These constraints come in two forms:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Boundary conditions&lt;/li&gt;
+&lt;li&gt;Satisfying a differential equation&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Boundary condition constraints look &lt;em&gt;identical&lt;/em&gt; to normal interpolation constraints; we prescribe the value of our function (or of the function derivative) at some specific location.&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;
+The satisfaction of the differential equation is where things are a bit more interesting.&lt;/p&gt;
+&lt;h2 id=&#34;collocation-for-a-generic-differential-equation&#34;&gt;Collocation for a Generic Differential Equation&lt;/h2&gt;
+&lt;p&gt;For a given differential equation (DE), assume we can write it in the form:&lt;/p&gt;
+&lt;p&gt;$$\mathcal{L}(u) = f$$&lt;/p&gt;
+&lt;p&gt;for $\mathcal{L}$ the DE operator, $u$ the solution function, and $f$ some source function.
+For example, the Poisson PDE is given by $u&amp;rsquo;&amp;rsquo;(x) = f$, therefore $\mathcal{L}(u) = u&amp;rsquo;&amp;rsquo;$.
+Another, more complicated example, would be the &lt;a href=&#34;https://en.wikipedia.org/wiki/Blasius_boundary_layer#Blasius_equation_-_first-order_boundary_layer&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Blasius Boundary layer equation&lt;/a&gt;, which is given as $2u&amp;rsquo;&amp;rsquo;&amp;rsquo; + u&amp;rsquo;&amp;rsquo; u = 0$.
+In this case, $\mathcal{L}(u) = 2u&amp;rsquo;&amp;rsquo;&amp;rsquo; + u&amp;rsquo;&amp;rsquo; u$.&lt;/p&gt;
+&lt;p&gt;The DE is subject to boundary conditions (and/or initial conditions).
+We will assume that the domain of the problem is $x = [0,1]$, and thus the boundaries are at $x=0$ and $x=1$.
+We assume two boundary conditions, though generally the number of boundary conditions for a general DE is determined by&lt;/p&gt;
+
+
+
+$$ 
+\begin{align*}
+	u&#39;(1) &amp;= a \\
+	u&#39;&#39;(1) &amp;= b
+\end{align*}
+$$
+
+&lt;h3 id=&#34;defining-the-solution-function&#34;&gt;Defining the Solution Function&lt;/h3&gt;
+&lt;p&gt;Following the steps from interpolation, we need to assume a form for our function.
+We&amp;rsquo;ll denote this function as $u^h$, which will be an approximate solution to the PDE.
+We assume the form:&lt;/p&gt;
+&lt;p&gt;$$u^h(x) = \sum_{n=0}^N c_n \phi_n(x)$$&lt;/p&gt;
+&lt;p&gt;where $c_n$ are our DOFs/coefficients and $\phi_n(x)$ are our basis functions.
+The choice of $\phi_n(x)$ is left arbitrary for this article.
+A few options are &lt;a href=&#34;https://mathworld.wolfram.com/LegendrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Legendre&lt;/a&gt;, &lt;a href=&#34;https://mathworld.wolfram.com/LaguerrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Laguerre&lt;/a&gt;, and &lt;a href=&#34;https://mathworld.wolfram.com/ChebyshevPolynomialoftheFirstKind.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev&lt;/a&gt; polynomials (which all have their own special properties, not discussed here),
+or non-polynomial basis functions, such as the &lt;a href=&#34;https://en.wikipedia.org/wiki/Fourier_series&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Fourier series&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;By defining $u=u^h$, we approximate the continuous PDE given above as:
+
+
+
+$$
+\begin{align*}
+    \mathcal{L}(u^h) &amp;= f \\
+    u&#39;^{\,h}(1) &amp;= a \\
+    u&#39;&#39;^{\,h}(1) &amp;= b
+\end{align*}
+$$
+&lt;/p&gt;
+&lt;h3 id=&#34;defining-the-constraints&#34;&gt;Defining the Constraints&lt;/h3&gt;
+&lt;p&gt;Before we determine the number of DOFs ($N+1$), we need to know the number of constraints.
+I&amp;rsquo;ve already mentioned that the boundary conditions represent constraints, so each boundary condition represents a constraint.
+We&amp;rsquo;ll denote the number of boundary constraints as $m_b$.&lt;/p&gt;
+&lt;p&gt;But for &amp;ldquo;Satisfying the differential equation&amp;rdquo;, the PDE is defined for the entire domain, not discrete locations.
+This is equivalent to defining an infinite number of constraints, one for for every possible location within the domain.
+This is obviously not feasible.&lt;/p&gt;
+&lt;p&gt;Therefore, &lt;strong&gt;we choose a select number of locations in the domain to enforce the PDE&lt;/strong&gt;.
+The locations that we use are called &lt;strong&gt;collocation points&lt;/strong&gt;.
+We&amp;rsquo;ll denote the number of collocation points as $m_c$.&lt;/p&gt;
+&lt;p&gt;So the total number of constraints are the number of boundary conditions plus the number of collocation points.
+Since we need the number of DoFs to match the number of constraints (see &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#polynomial-order&#34;&gt;Interpolation Theory 101&lt;/a&gt;), we get:&lt;/p&gt;
+&lt;p&gt;$$N + 1 = m_b + m_c $$&lt;/p&gt;
+&lt;h3 id=&#34;determining-the-collocation-points&#34;&gt;Determining the Collocation Points&lt;/h3&gt;
+&lt;p&gt;We still need to determine how many collocation points and where on the domain they should be.
+This is a more nuanced discussion, so I&amp;rsquo;ve moved a more detailed discussion of it to &lt;a href=&#34;#appendix-a-determining-collocation-points-continued&#34;&gt;Appendix A&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;For right now, we&amp;rsquo;ll assume the number of collocation points is arbitrary and that the points are evenly distributed across the domain.
+We denote the set of collocation point locations as:&lt;/p&gt;
+
+
+
+$$\left\{\xi_j \right\}_{j=1}^{m_ c}$$
+
+&lt;h3 id=&#34;creating-the-system-of-equations&#34;&gt;Creating the System of Equations&lt;/h3&gt;
+&lt;p&gt;To create the system of equations, just like with interpolation, we simply express each constraint in terms of $u^h$ and expand the definition of it.
+So for our boundary conditions, we end up with:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+u&#39;^{\,h}(1) = a \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;(1) + c_1 \phi_1&#39;(1) + \dots + c_N \phi_N&#39;(1) = a \\
+u&#39;&#39;^{\,h}(1) = b \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(1) + c_1 \phi_1&#39;&#39;(1) + \dots + c_N \phi_N&#39;&#39;(1) = b
+\end{align*}
+$$
+
+&lt;p&gt;The &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#slope-constraints&#34;&gt;slope constraints section of my interpolation theory post&lt;/a&gt; has a derivation for 
+
+$u&#39;^{\, h}(x) = \sum_{n=0}^N c_n \phi_n&#39;(x)$.&lt;/p&gt;
+&lt;p&gt;Next, we do the same for the collocation points.
+This forms a set of $m_c$ equations:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+\mathcal{L}(u^h(\xi_1)) &amp;= f(\xi_1) \\
+\mathcal{L}(u^h(\xi_2)) &amp;= f(\xi_2) \\
+\vdots  \\
+\mathcal{L}(u^h(\xi_{m_c})) &amp;= f(\xi_{m_c}) \\
+\end{align*}
+$$
+
+&lt;h3 id=&#34;matrix-form&#34;&gt;Matrix Form&lt;/h3&gt;
+&lt;p&gt;If $\mathcal{L}$ is linear, we can express the PDE as:&lt;/p&gt;
+&lt;p&gt;$$\mathcal{L}(\sum_{n=0}^N c_n \phi_n(x)) = \sum_{n=0}^N c_n \mathcal{L}(\phi_n(x))$$&lt;/p&gt;
+&lt;p&gt;An example of a linear operator would be the Poisson equation $\mathcal{L}(u) = u&amp;rsquo;&amp;rsquo;$, since the derivative operator is a linear operator itself.&lt;/p&gt;
+&lt;p&gt;We can take the coefficients $c_n$ and move them into a separate vector $c$ and can form a $(N+1) \times (N+1)$:&lt;/p&gt;
+
+
+
+$$
+\begin{bmatrix}
+\phi_0(1) &amp; \phi_1(1) &amp; \cdots &amp; \phi_N(1) \\[8pt]
+\phi&#39;_0(1) &amp; \phi&#39;_1(1) &amp; \cdots &amp; \phi&#39;_N(1) \\[8pt]
+\mathcal{L}(\phi_0(\xi_1)) &amp; \mathcal{L}(\phi_1(\xi_1)) &amp; \cdots &amp; \mathcal{L}(\phi_N(\xi_1)) \\[8pt]
+\vdots  &amp; \vdots  &amp; \ddots &amp; \vdots  \\[8pt]
+\mathcal{L}(\phi_0(\xi_{m_c})) &amp; \mathcal{L}(\phi_1(\xi_{m_c})) &amp; \cdots &amp; \mathcal{L}(\phi_N(\xi_{m_c}))
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\[8pt]
+c_1 \\[8pt]
+c_2 \\[8pt]
+\vdots  \\[8pt]
+c_N \\[8pt]
+\end{bmatrix}
+
+=
+\begin{bmatrix}
+a \\[8pt]
+b \\[8pt]
+f(\xi_1) \\[8pt]
+\vdots  \\[8pt]
+f(\xi_{m_c}) \\[8pt]
+\end{bmatrix}
+$$
+
+&lt;h3 id=&#34;residual-form&#34;&gt;Residual form&lt;/h3&gt;
+&lt;p&gt;If $\mathcal{L}$ is a nonlinear differential operator, we cannot bring the sum over coefficients out of the operator argument.
+An example of a nonlinear differential operator would be the Blasius equation $\mathcal{L}(u) = 2u&amp;rsquo;&amp;rsquo;&amp;rsquo; + u&amp;rsquo;&amp;rsquo; u$.
+The $u&amp;rsquo;&amp;rsquo; u$ term is specifically what makes the differential operator non-linear.&lt;/p&gt;
+&lt;p&gt;Since we cannot separate the coefficients from a nonlinear operator argument, we cannot form a matrix system of equations.
+Instead, we need to create a residual function, which can then be used by a nonlinear equation solver to find our solution.&lt;/p&gt;
+&lt;p&gt;To obtain the residual function, we simply take the system of equations defined &lt;a href=&#34;#creating-the-system-of-equations&#34;&gt;above&lt;/a&gt; and shift all the terms to the left-hand side such that they all equal zero.
+Since the coefficients $c_n$ completely define $u^h$, we often say that the residual is a function of the coefficients.
+Doing this, we obtain:&lt;/p&gt;
+
+
+
+$$
+R(u^h) =
+R \left(
+\begin{bmatrix}
+c_0 \\[8pt]
+c_1 \\[8pt]
+c_2 \\[8pt]
+\vdots  \\[8pt]
+c_N \\[8pt]
+\end{bmatrix}
+\right)
+= 
+
+\begin{bmatrix}
+\sum_{i=0}^N c_i \phi_i(1) - a \\[8pt]
+\sum_{i=0}^N c_i \phi&#39;_i(1) -b \\[8pt]
+\mathcal{L}\left(u^h(\xi_1)\right) - f(\xi_1) \\[8pt]
+\vdots  \\[8pt]
+\mathcal{L}\left(u^h(\xi_{m_c})\right) - f(\xi_{m_c}) \\[8pt]
+\end{bmatrix}
+$$
+
+&lt;h2 id=&#34;example-pde-poisson&#34;&gt;Example PDE: Poisson&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s apply this to the 1-D Poisson equation for a domain of $x \in [0,1]$:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+    u&#39;&#39;(x) &amp;= f(x) \quad x \in [0,1] \\
+    u(0) &amp;= 1 \\
+    u&#39;(1) &amp;= 2
+\end{align*}
+$$
+
+&lt;p&gt;where the last two equations are our boundary conditions.&lt;/p&gt;
+&lt;p&gt;We take the same general form of $u^h$ as in the general case:&lt;/p&gt;
+&lt;p&gt;$$u^h(x) = \sum_{n=0}^N c_n \phi_n(x)$$&lt;/p&gt;
+&lt;p&gt;By defining $u=u^h$, we approximate the continuous PDE given above as:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+    u&#39;&#39;^{\,h}(x) &amp;= f(x) \quad x \in [0,1] \\
+    u^h(0) &amp;= 1 \\
+    u&#39;^{\,h}(1) &amp;= 2
+\end{align*}
+$$
+
+&lt;h3 id=&#34;creating-the-system-of-equations-1&#34;&gt;Creating the System of Equations&lt;/h3&gt;
+&lt;p&gt;For our boundary conditions, we end up with:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+u^h(0) = 1 \quad &amp;\Rightarrow \quad c_0 \phi_0(0) + c_1 \phi_1(0) + \dots + c_N \phi_N(0) = 1 \\
+u&#39;^{\,h}(1) = 2 \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;(1) + c_1 \phi_1&#39;(1) + \dots + c_N \phi_N&#39;(1) = 2
+\end{align*}
+$$
+
+&lt;p&gt;For the PDE itself, we just evaluate the PDE approximated with $u^h$ at the collocation points:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+u&#39;&#39;^{\,h}(\xi_1) =  \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(\xi_1) + c_1 \phi_1&#39;&#39;(\xi_1) + \dots + c_N \phi_N&#39;&#39;(\xi_1) = f(\xi_1) \\
+u&#39;&#39;^{\,h}(\xi_2) =  \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(\xi_2) + c_1 \phi_1&#39;&#39;(\xi_2) + \dots + c_N \phi_N&#39;&#39;(\xi_2) = f(\xi_2) \\
+\vdots \\
+u&#39;&#39;^{\,h}(\xi_{m_c}) =  \quad &amp;\Rightarrow \quad c_0 \phi_0&#39;&#39;(\xi_{m_c}) + c_1 \phi_1&#39;&#39;(\xi_{m_c}) + \dots + c_N \phi_N&#39;&#39;(\xi_{m_c}) = f(\xi_{m_c}) \\
+\end{align*}
+$$
+
+&lt;p&gt;Since the Poisson operator is linear, we can form the following matrix problem:&lt;/p&gt;
+
+
+
+$$
+\begin{bmatrix}
+\phi_0(0) &amp;  \phi_1(0) &amp; \dots &amp;  \phi_N(0) \\
+\phi_0&#39;(1) &amp;  \phi_1&#39;(1) &amp; \dots &amp;  \phi_N&#39;(1)  \\
+\phi_0&#39;&#39;(\xi_1) &amp;  \phi_1&#39;&#39;(\xi_1) &amp; \dots &amp;  \phi_N&#39;&#39;(\xi_1) \\
+\phi_0&#39;&#39;(\xi_2) &amp;  \phi_1&#39;&#39;(\xi_2) &amp; \dots &amp;  \phi_N&#39;&#39;(\xi_2) \\
+\vdots  &amp; \vdots  &amp; \ddots &amp; \vdots  \\[8pt]
+\phi_0&#39;&#39;(\xi_{m_c}) &amp;  \phi_1&#39;&#39;(\xi_{m_c}) &amp; \dots &amp;  \phi_N&#39;&#39;(\xi_{m_c}) \\
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+c_2 \\
+c_3 \\
+\vdots  \\
+c_N \\
+\end{bmatrix}
+
+=
+\begin{bmatrix}
+1 \\
+2 \\
+f(\xi_1) \\
+f(\xi_2) \\
+\vdots  \\
+f(\xi_{m_c}) \\
+\end{bmatrix}
+$$
+
+&lt;p&gt;And tada! You have the collocation method for the Poisson PDE.
+All you need to do is solve this matrix equation for the DOFs $c_n$ and then reconstruct $u^h$ to have your solution!&lt;/p&gt;
+&lt;h2 id=&#34;appendix-a-determining-collocation-points-continued&#34;&gt;Appendix A: Determining Collocation Points Continued&lt;/h2&gt;
+&lt;p&gt;Note we have yet to determine the number of collocation points or the location of the collocation points.&lt;/p&gt;
+&lt;h3 id=&#34;how-many&#34;&gt;How many?&lt;/h3&gt;
+&lt;p&gt;Choosing the number of collocation points $m_c$ is completely arbitrary.
+Even if $u^h$ exactly satisfies the PDE at the collocation points, there are no guarantees how well (or poorly) $u^h$ satisfies the PDE for the rest of the domain.
+What we do know is that the more points you have, the more accurate your solution becomes (generally).
+How many points is &amp;ldquo;good enough&amp;rdquo; is highly problem dependent.&lt;/p&gt;
+&lt;p&gt;Beyond accuracy though, increasing the number of points also increases the size of your system of equations.
+Depending on your choice of collocation locations and basis functions, the system of equations you end up with may be infeasible to solve.&lt;/p&gt;
+&lt;h3 id=&#34;where-should-the-collocation-points-be-located&#34;&gt;Where should the collocation points be located?&lt;/h3&gt;
+&lt;p&gt;This is also an arbitrary choice; they can be wherever you want them to be.
+But this choice can have significant implications on the stiffness of your resulting system of equations.&lt;/p&gt;
+&lt;p&gt;The general advice is to choose locations that are the roots of some $m_c -1$ order orthogonal polynomial.
+The reason for this choice is beyond the scope of the article, but it is intimately related to Gauss quadrature (which also uses the roots of orthogonal polynomials).&lt;/p&gt;
+&lt;p&gt;A good general choice to place collocation points at &lt;a href=&#34;https://en.wikipedia.org/wiki/Chebyshev_nodes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev nodes&lt;/a&gt;, which are the roots of &lt;a href=&#34;https://en.wikipedia.org/wiki/Chebyshev_polynomials&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev polynomials&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;This is not strictly necessary, but for ease of teaching (and it&amp;rsquo;s broad applicability), we&amp;rsquo;ll make this assumption. See &lt;a href=&#34;https://www.jameswright.xyz/post/20220925/interpolation-theory-101/#non-linear-gx-with-respect-to-degrees-of-freedom&#34;&gt;the interpolation appendix&lt;/a&gt; for more information about that.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34;&gt;
+&lt;p&gt;This is true for Dirichlet ($u=g$) and Neumann ($u&amp;rsquo;=h$) boundary conditions, and any other boundary conditions that specifies a value for the solution function or it&amp;rsquo;s derivative. However, this is not true for other classes of boundary conditions, such as &lt;a href=&#34;https://en.wikipedia.org/wiki/Robin_boundary_condition&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Robin boundary conditions&lt;/a&gt; ($gu + hu&amp;rsquo; = a$). For Robin and it&amp;rsquo;s ilk, you would express it as a differential operator acting only on the boundary ($\mathcal{L}(u) = gu + hu&amp;rsquo; = a$ on the boundary).&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Interpolation Theory 101</title>
+      <link>https://www.jameswright.xyz/post/20220925/interpolation-theory-101/</link>
+      <pubDate>Sun, 25 Sep 2022 09:47:26 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20220925/interpolation-theory-101/</guid>
+      <description>
+
+&lt;details class=&#34;toc-inpage d-print-none  &#34; open&gt;
+  &lt;summary class=&#34;font-weight-bold&#34;&gt;Table of Contents&lt;/summary&gt;
+  &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#interpolation-problem-intro&#34;&gt;Interpolation Problem Intro&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#polynomial-order&#34;&gt;Polynomial order&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#solving-the-interpolation-problem&#34;&gt;Solving the interpolation problem&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#for-arbitrary-function-basis&#34;&gt;For arbitrary function basis&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#slope-constraints&#34;&gt;Slope constraints&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#appendix-a-further-thoughts-on-non-polynomial-functions&#34;&gt;Appendix A: Further thoughts on non-polynomial functions&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#required-degrees-of-freedom-for-gx&#34;&gt;Required Degrees-of-freedom for $g(x)$&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#non-linear-gx-with-respect-to-degrees-of-freedom&#34;&gt;Non-linear $g(x)$ with respect to degrees-of-freedom&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/details&gt;
+
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Pre-requisites: There are a few assumptions made for the reader&amp;rsquo;s background.
+Mainly, that you&amp;rsquo;re familiar with the concept of a &lt;em&gt;basis&lt;/em&gt; in the linear algebra sense and, in particular, function space bases (such as the monomials).
+Also, being familiar with turning a system of linear equations into it&amp;rsquo;s equivalent matrix form would be beneficial.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;interpolation-problem-intro&#34;&gt;Interpolation Problem Intro&lt;/h2&gt;
+&lt;p&gt;In interpolation, we wish to find a function $g(x)$ that satisfies $g(x_i) = y_i$ for some positive number $i$. We&amp;rsquo;ll call these &lt;strong&gt;constraints&lt;/strong&gt; on the function $g(x)$. We say that the constraint is &lt;em&gt;satisfied&lt;/em&gt; if $g(x)$ passes through the point $(x_i, y_i)$.&lt;/p&gt;
+&lt;p&gt;In the case of polynomial interpolation, we assume a form
+$$g(x) = \sum_{n=0}^N c_n \phi_n(x)$$&lt;/p&gt;
+&lt;p&gt;where $\phi_n(x)$ represents some set of &lt;a href=&#34;https://en.wikipedia.org/wiki/Basis_function&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;basis functions&lt;/a&gt;. The simplest case of this is the monomials, where $\phi_n(x) = x^n$, such that:&lt;/p&gt;
+&lt;p&gt;$$g(x) = c_0  + c_1 x + c_2 x^2 + \dots + c_N x^{N}$$&lt;/p&gt;
+&lt;p&gt;This forms a basis for the space of $N$th order polynomials.
+However, we can choose $\phi_n$ to be any set of basis functions for polynomials, such as the &lt;a href=&#34;https://mathworld.wolfram.com/LegendrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Legendre&lt;/a&gt;, &lt;a href=&#34;https://mathworld.wolfram.com/LaguerrePolynomial.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Laguerre&lt;/a&gt;, and &lt;a href=&#34;https://mathworld.wolfram.com/ChebyshevPolynomialoftheFirstKind.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chebyshev&lt;/a&gt; polynomials (which all have their own special properties, not discussed here).
+You can even have non-polynomial basis functions, such as the &lt;a href=&#34;https://en.wikipedia.org/wiki/Fourier_series&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Fourier series&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;For just right now though, I&amp;rsquo;ll stick to talking about $g(x)$ living in the space of polynomials.&lt;/p&gt;
+&lt;h2 id=&#34;polynomial-order&#34;&gt;Polynomial order&lt;/h2&gt;
+&lt;p&gt;A question does remain though: What kind (order) of polynomial should we try to interpolate with?&lt;/p&gt;
+&lt;p&gt;Well, if we have $m+1$ constraints, then we need, &lt;em&gt;at minimum&lt;/em&gt;, a $m$th order polynomial to interpolate them. For example, we need 2 points ($m+1=2 \ \therefore m=1$) to make a line ($N = m = 1$ order polynomial).&lt;/p&gt;
+&lt;p&gt;So what about polynomials greater than order $m$? Well, then an infinite number polynomials satisfy the constraints. Example: If we only have 1 constraint ($m+1=1 \ \therefore m=0$) and there are an infinite number of lines that can satisfy that constraint.&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;d like for a solution to the problem to exist ($N \geq m$) and for that solution to be unique ($N &amp;lt; m+1$). Therefore, &lt;strong&gt;the order of the polynomial should be one less than the number of constraints ($N = m$)&lt;/strong&gt;.&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt;Alternative Thought Process&lt;/summary&gt;
+&lt;p&gt;An alternative way of thinking about it is that our constraints setup $m+1$ equations.
+To find a solution, we must have the number of unknowns match the number of equations.
+Since a $N$th order polynomial has $N+1$ unknowns, then $N + 1 = m + 1 \ \rightarrow \ N = m$.&lt;/p&gt;
+&lt;/details&gt;
+&lt;h2 id=&#34;solving-the-interpolation-problem&#34;&gt;Solving the interpolation problem&lt;/h2&gt;
+&lt;p&gt;Now we have $m+1$ constraints, and know that $g(x)$ should be a $N = m$ order polynomial. So how do find $g(x)$?&lt;/p&gt;
+&lt;p&gt;The most straight forward way is to simply plug the constraints into $g(x)$. Doing this gives us the set of linear equations:&lt;/p&gt;
+
+
+
+\begin{align*}
+g(x_0) &amp;= c_0  + c_1 x_0 + c_2 x_0^2 + \dots + c_N x_0^{N} &amp;= y_0 \\
+g(x_1) &amp;= c_0  + c_1 x_1 + c_2 x_1^2 + \dots + c_N x_1^{N} &amp;= y_1 \\
+\vdots \\
+g(x_m) &amp;= c_0  + c_1 x_m + c_2 x_m^2 + \dots + c_N x_m^{N} &amp;= y_m \\
+\end{align*}
+
+&lt;p&gt;We turn this into a matrix problem that looks like:&lt;/p&gt;
+
+
+
+$$
+\begin{bmatrix}
+1  &amp;  x_0 &amp;  x_0^2 &amp; \dots &amp;  x_0^{N} \\[2pt]
+1  &amp;  x_1 &amp;  x_1^2 &amp; \dots &amp;  x_1^{N} \\[2pt]
+\vdots \\[2pt]
+1  &amp;  x_m &amp;  x_m^2 &amp; \dots &amp;  x_m^{N} \\[2pt]
+\end{bmatrix}
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots \\
+c_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+y_0 \\
+y_1 \\
+\vdots \\
+y_m \\
+\end{bmatrix}
+$$
+
+&lt;p&gt;The matrix above is known as a Vandermonde matrix. By solving this system, we find the coefficients $c_n$ that we can then reconstruct into $g(x) = \sum_{n=0}^N c_n x^n$.&lt;/p&gt;
+&lt;h2 id=&#34;for-arbitrary-function-basis&#34;&gt;For arbitrary function basis&lt;/h2&gt;
+&lt;p&gt;Remember that we chose $\phi_n(x) = x^n$, which are the monomial bases.
+This works fine, but the resulting problem is very difficult to solve computationally (it is &lt;a href=&#34;https://en.wikipedia.org/wiki/Condition_number&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;em&gt;ill-conditioned&lt;/em&gt;&lt;/a&gt;).
+Other choices of $\phi_n(x)$ can help reduce the difficulty significantly, such as the aforementioned Chebyshev polynomials.
+In fact, we don&amp;rsquo;t even need $\phi_n(x)$ to be defined by a polynomial.
+For example, we could choose the Fourier series (so $g(x) = c_0 + \sum_{n=1}^N c_n \cos(nx) + s_n \sin(nx)$).
+This is &lt;a href=&#34;#appendix-a-further-thoughts-on-non-polynomial-functions&#34;&gt;discussed in more detail below&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Regardless of the choice of your basis functions, there&amp;rsquo;s one primary question:
+&lt;strong&gt;How do we go about finding the interpolating function using other bases?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Answer: We create a different matrix to solve with.
+Recall that we defined $g(x) = \sum_{n=0}^N c_n \phi_n(x)$.
+Using an arbitrary $\phi_n(x)$ instead of the monomials $x^n$, we can apply each constraint, expand our definition of $g(x)$, and get the following system of equations:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+g(x_0) &amp;= c_0\phi_0(x_0)  + c_1 \phi_1(x_0) + \dots + c_N \phi_N(x_0) &amp;= y_0 \\
+g(x_1) &amp;= c_0\phi_0(x_1)  + c_1 \phi_1(x_1) + \dots + c_N \phi_N(x_1) &amp;= y_1 \\
+\vdots \\
+g(x_m) &amp;= c_0\phi_0(x_m)  + c_1 \phi_1(x_m) + \dots + c_N \phi_N(x_m) &amp;= y_m \\
+\end{align*}
+$$
+
+&lt;p&gt;This system of equation results in the matrix problem:
+
+
+
+$$
+\begin{bmatrix}
+\phi_0(x_0)  &amp; \phi_1(x_0) &amp; \dots &amp; \phi_N(x_0)\\
+\phi_0(x_1)  &amp; \phi_1(x_1) &amp; \dots &amp; \phi_N(x_1)\\
+\vdots \\
+\phi_0(x_m)  &amp; \phi_1(x_m) &amp; \dots &amp; \phi_N(x_m)\\
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots \\
+c_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+y_0 \\
+y_1 \\
+\vdots \\
+y_m \\
+\end{bmatrix}
+$$
+&lt;/p&gt;
+&lt;p&gt;Just as before, we can then solve this matrix problem, then reconstruct $g(x)$ using the coefficients $c_n$.&lt;/p&gt;
+&lt;h2 id=&#34;slope-constraints&#34;&gt;Slope constraints&lt;/h2&gt;
+&lt;p&gt;What if instead of wanting $g(x)$ to go through a specific point, we instead want the function to match a specific slope at a point? This is particularly useful for something like splines, where we want a smooth transition between one curve and another. Well, we can find a $g(x)$ that meets that constraint too!&lt;/p&gt;
+&lt;p&gt;First assume we replace the first interpolation constraint ($g(x_0) = y_0$) with a slope constraint ($g&amp;rsquo;(x_0) = s_0$), where $g&amp;rsquo; = \partial g / \partial x$.&lt;/p&gt;
+&lt;p&gt;Recall that we set $g(x) = \sum_{n=0}^N c_n \phi_n(x)$. To find $g&amp;rsquo;(x)$, we can simply take the derivative of sum expression:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+\frac{\partial}{\partial x} g(x) 
+&amp;= \frac{\partial}{\partial x} \left [c_0\phi_0(x)  + c_1 \phi_1(x) + \dots + c_N \phi_N(x) \right] \\
+&amp;= \frac{\partial}{\partial x} c_0\phi_0(x)  + \frac{\partial}{\partial x} c_1 \phi_1(x) + \dots + \frac{\partial}{\partial x} c_N \phi_N(x) \\[12pt]
+g&#39;(x) &amp;= c_0\phi&#39;_0(x)  + c_1 \phi&#39;_1(x) + \dots + c_N \phi&#39;_N(x)
+\end{align*}
+$$
+
+&lt;p&gt;So the derivative of $g(x)$ is just the sum of the derivatives of $\phi_n(x)$ weighted by the coefficients $c_n$. This is quite nice, as our function coefficients for $g(x)$ are the same as for $g&amp;rsquo;(x)$.&lt;/p&gt;
+&lt;p&gt;Using this result, we can write our slope constraint as:&lt;/p&gt;
+&lt;p&gt;$$g&amp;rsquo;(x_0) = c_0\phi_0&amp;rsquo;(x_0)  + c_1 \phi_1&amp;rsquo;(x_0) + \dots + c_N \phi_N&amp;rsquo;(x_0) = s_0$$&lt;/p&gt;
+&lt;p&gt;Recall that we replace our first interpolation constraint $g(x_0) = y_0$ with the slope constraint $g&amp;rsquo;(x_0) = s_0$. We can then replace the first equation in the linear system described above with $g&amp;rsquo;(x_0) = s_0$. This results in the matrix problem:
+
+
+
+$$
+\begin{bmatrix}
+\phi_0&#39;(x_0)  &amp; \phi_1&#39;(x_0) &amp; \dots &amp; \phi_N&#39;(x_0)\\
+\phi_0(x_1)  &amp; \phi_1(x_1) &amp; \dots &amp; \phi_N(x_1)\\
+\vdots \\
+\phi_0(x_m)  &amp; \phi_1(x_m) &amp; \dots &amp; \phi_N(x_m)\\
+\end{bmatrix}
+
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots \\
+c_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+s_0 \\
+y_1 \\
+\vdots \\
+y_m \\
+\end{bmatrix}
+$$
+&lt;/p&gt;
+&lt;p&gt;This looks nearly identical to our pure-interpolation matrix problem! The only difference is that the first row of our matrix replaces $\phi_n \rightarrow \phi_n&amp;rsquo;$ and the first entry on the right hand side vector replaces $y_0 \rightarrow s_0$.&lt;/p&gt;
+&lt;p&gt;This last result is incredibly powerful. Using it, we can actually solve differential equations. This will be discussed in a later article.&lt;/p&gt;
+&lt;h2 id=&#34;appendix-a-further-thoughts-on-non-polynomial-functions&#34;&gt;Appendix A: Further thoughts on non-polynomial functions&lt;/h2&gt;
+&lt;p&gt;When using non-polynomials basis functions, terminology can change a bit, but the concepts are the same.&lt;/p&gt;
+&lt;h3 id=&#34;required-degrees-of-freedom-for-gx&#34;&gt;Required Degrees-of-freedom for $g(x)$&lt;/h3&gt;
+&lt;p&gt;For example, we stated that for $m+1$ constraints, we need an $m$th order polynomial.
+For non-polynomial basis function, we instead say that we need the number of degrees-of-freedom (DOFs) $N+1$ to equal the number of constraints $m+1$.
+For basis functions, the DOFs are the coefficients.
+Note this rule still applies to polynomials (a $N$th order polynomial has $N+1$ coefficients), but saying the order of the polynomial is more common-place and can be simpler to relate to the polynomial itself.&lt;/p&gt;
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Note that it may seem confusing to have both number of DOFs and number of constraints denoted as $X+1$ rather than simply $X$.
+This is due to the fact that conventionally the zero index for DOFs corresponds to the constant function, which is the 0th order polynomial.
+This convention often extends to non-polynomial functions as well (ie. Fourier series).
+We apply the same logic to the constraints to so that we can make simple statements like $N = m$ (which inherently means that $N+1 = m+1$).
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;non-linear-gx-with-respect-to-degrees-of-freedom&#34;&gt;Non-linear $g(x)$ with respect to degrees-of-freedom&lt;/h3&gt;
+&lt;p&gt;Also, note that we&amp;rsquo;ve restricted ourselves to function bases.
+This means that we can express $g(x)$ as a sum of those function bases times coefficients, which allows us to separate the coefficients away from the basis functions.
+However, we can work with expressions of $g(x)$ that are non-linear with respect to their degrees-of-freedom.
+An example of that is an alternate form of the Fourier series:&lt;/p&gt;
+&lt;p&gt;$$g(x) = \frac{c_0}{2} + \sum_{n=1}^N c_n \cos(2\pi n x + \psi_n)$$&lt;/p&gt;
+&lt;p&gt;Note that $\psi_n$ is a degrees-of-freedom for $g(x)$, but we can&amp;rsquo;t take it out of the sum; it&amp;rsquo;s inside the $\cos$ expression.
+This must be solved as a &lt;em&gt;non-linear equation&lt;/em&gt;, which can&amp;rsquo;t be expressed as a solution to a matrix problem.
+In order to solve this, you must express the problem in a residual form, and use a non-linear solver to find the solution.
+I&amp;rsquo;ll quickly cover the former, but not the latter.&lt;/p&gt;
+&lt;p&gt;First, I&amp;rsquo;ll denote $g(x)$ as $g(\mathbf c; x)$, to show that $g$ is a function of the $x$ function evaluation, but also the set of DOFs $\mathbf c$.
+To create the residual form, we form a system of equations of the form:&lt;/p&gt;
+
+
+
+$$
+\begin{align*}
+g(\mathbf c; x_0) - y_0 &amp;= 0 \\
+g(\mathbf c; x_1) - y_1 &amp;= 0 \\
+\vdots \\
+g(\mathbf c; x_m) - y_m &amp;= 0 \\
+\end{align*}
+$$
+
+&lt;p&gt;Using this, we get the vector-valued residual function for this system:&lt;/p&gt;
+
+
+
+$$
+R\left(g(\mathbf c; x)\right) =
+R \left(
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+\vdots  \\
+c_N \\
+\end{bmatrix}
+\right)
+= 
+
+\begin{bmatrix}
+g(\mathbf c; x_0) - y_0\\
+g(\mathbf c; x_1) - y_1\\
+\vdots \\
+g(\mathbf c; x_m) - y_m\\
+\end{bmatrix}
+$$
+
+&lt;p&gt;The non-linear solve then finds the set of degrees-of-freedom such that $R(g(\mathbf c; x)) = \mathbf 0$.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Calculate Wall Shear Gradient from Velocity Gradient</title>
+      <link>https://www.jameswright.xyz/post/20200813/calculate_wall_shear_from_velocity_gradient/</link>
+      <pubDate>Thu, 13 Aug 2020 09:49:47 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200813/calculate_wall_shear_from_velocity_gradient/</guid>
+      <description>&lt;p&gt;The gradient of velocity is generally easy to compute in most CFD
+post-processing routines. But let&amp;rsquo;s say you want to find the wall shear stress
+from this quantity, how would you do that? I&amp;rsquo;d been searching for an answer to
+this question and could never really find one (or at least one that was
+satisfying). Eventually I derived out the following solution and figured I&amp;rsquo;d
+post it so that the information was more widely available.&lt;/p&gt;
+&lt;h2 id=&#34;initial-definitions&#34;&gt;Initial Definitions&lt;/h2&gt;
+&lt;p&gt;First, let&amp;rsquo;s define more explicitly what we&amp;rsquo;re trying to find. The wall shear
+stress is often given as:&lt;/p&gt;
+&lt;p&gt;$$ \tau_w = \mu \left (\frac{\partial u}{\partial y}\right )
+\Bigg\rvert_{y=\text{wall}} $$&lt;/p&gt;
+&lt;p&gt;However, this isn&amp;rsquo;t very explicit and really only applies to flat plate
+boundary layer flows. I&amp;rsquo;d submit that the &amp;ldquo;real&amp;rdquo; definition is dynamic
+viscosity ($\mu$) times the wall-normal gradient of velocity tangential to the
+wall taken at the wall, or:&lt;/p&gt;
+&lt;p&gt;$$ \tau_w = \mu \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} $$&lt;/p&gt;
+&lt;p&gt;This will result in a vector parallel to the wall in the direction of the wall
+shear stress.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;ll define the velocity gradient as a tensor $E_{ij}\ $:&lt;/p&gt;
+&lt;p&gt;$$ E_{ij} = \frac{\partial u_i}{\partial x_j} = \partial_j u_i$$&lt;/p&gt;
+&lt;p&gt;Note that $E_{ij}$ is &lt;em&gt;not&lt;/em&gt; symmetric and that $\partial_j$ is still an
+operator with $u_i$ as it&amp;rsquo;s input, not multiplication.&lt;/p&gt;
+&lt;p&gt;Lastly, we have the common form of projecting a vector onto a plane given its
+normal vector:&lt;/p&gt;
+&lt;p&gt;$$ \text{proj}_{\hat n}(\overrightarrow{u}) = \overrightarrow{u} -
+(\overrightarrow{u} \cdot \hat n) \hat n
+= u_i - (u_j \hat n_j) \hat n_i$$&lt;/p&gt;
+&lt;p&gt;where $\hat n$ is the wall-normal unit vector. The right most term is in index
+summation notation.&lt;/p&gt;
+&lt;h2 id=&#34;preamble&#34;&gt;Preamble&lt;/h2&gt;
+&lt;h3 id=&#34;assumptions&#34;&gt;Assumptions&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;We have a wall-normal unit vector $\hat n_i$&lt;/li&gt;
+&lt;li&gt;We have the velocity gradient tensor $E_{ij} = \partial_j u_i$&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;goal&#34;&gt;Goal&lt;/h3&gt;
+&lt;p&gt;Obtain:&lt;/p&gt;
+&lt;p&gt;$$ \left (\frac{\partial u_\parallel}{\partial n}\right ) \Bigg\rvert_{n=0} =
+\left (\partial_{\hat n} u_\parallel\right ) \big\rvert_{n=0} =
+f(E_{ij}, \hat n) = f(\partial_j u_i, \hat n)$$&lt;/p&gt;
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+&lt;p&gt;For the impatient, the solution is:&lt;/p&gt;
+&lt;p&gt;$$ \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} = \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} = f(\hat n, E_{ij})$$&lt;/p&gt;
+&lt;p&gt;The derivation of the above equation is given below.&lt;/p&gt;
+&lt;h2 id=&#34;derivation&#34;&gt;Derivation&lt;/h2&gt;
+&lt;p&gt;Notice that the wall shear gradient can be broken into two &amp;ldquo;terms&amp;rdquo;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;gradient in the wall-normal direction&lt;/li&gt;
+&lt;li&gt;velocity tangent to the wall&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;First we&amp;rsquo;ll define these two &amp;ldquo;terms&amp;rdquo; individually&lt;/p&gt;
+&lt;h3 id=&#34;gradient-in-the-wall-normal-direction&#34;&gt;Gradient in the Wall-Normal Direction&lt;/h3&gt;
+&lt;p&gt;This is simply:&lt;/p&gt;
+&lt;p&gt;$$\hat n_j \partial_j$$&lt;/p&gt;
+&lt;p&gt;Gradient in a specific direction should result in a tensor whose rank is the
+same as it&amp;rsquo;s input. In other words, the gradient of a scalar in a single
+direction should result in a scalar (which is a rank 0 tensor). The summation
+over the $j$ index shows that this is true.&lt;/p&gt;
+&lt;h3 id=&#34;velocity-tangent-to-the-wall&#34;&gt;Velocity Tangent to the Wall&lt;/h3&gt;
+&lt;p&gt;Taking the vector projection formula from &lt;a href=&#34;#initial-definitions&#34;&gt;Initial
+Definitions&lt;/a&gt;, this is fairly straight forward:&lt;/p&gt;
+&lt;p&gt;$$ u_{i,\parallel} = u_i - (u_k \hat n_k) \hat n_i$$&lt;/p&gt;
+&lt;h3 id=&#34;combining-terms&#34;&gt;Combining Terms&lt;/h3&gt;
+&lt;p&gt;Putting these together, we get:&lt;/p&gt;
+&lt;p&gt;$$\underbrace{\hat n_j \partial_j}_{\partial_{\hat n}}
+[\underbrace{u_i - (u_k \hat n_k) \hat n_i }_{u_{\parallel}}]$$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \hat n_j \partial_j \left [u_k (\delta_{ik} - \hat n_k \hat n_i)
+\right]$$&lt;/p&gt;
+&lt;p&gt;Using product rule:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j \partial_j (u_k) +
+u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i)$$&lt;/p&gt;
+&lt;p&gt;First, let&amp;rsquo;s work with the right hand term (RHT):&lt;/p&gt;
+&lt;p&gt;$$ \text{RHT} = u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i) $$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_k \left [\hat n_j \partial_j (\delta_{ik}) - \hat n_j
+\partial_j (\hat n_k \hat n_i) \right ]$$&lt;/p&gt;
+&lt;p&gt;The Kronecker delta is invariant of spacial dimensions, so the left term goes to
+zero. Then we can do product rule again on the right term.&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_k \left [\hat n_j \cancelto{0}{\partial_j (\delta_{ik})} - \hat n_j
+\partial_j (\hat n_k \hat n_i)) \right ]$$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow -u_k  \left [\hat n_i \hat n_j \partial_j (\hat n_k) + \hat n_k
+\hat n_j \partial_j (\hat n_i) \right ]$$&lt;/p&gt;
+&lt;p&gt;Here, $\hat n$ is &lt;em&gt;not&lt;/em&gt; invariant of spacial location; if you have a non-flat
+surface, it will change as you move along the wall. However, note that $\hat
+n_j \partial_j$ is the gradient in the wall-normal direction. The $\hat n$
+does not change in the wall-normal direction; it only change in the
+wall-parallel direction. Thus:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow -u_k  \left [\hat n_i \cancelto{0}{\hat n_j \partial_j (\hat
+n_k)} + \hat n_k \cancelto{0}{\hat n_j \partial_j (\hat n_i)} \right ]$$&lt;/p&gt;
+&lt;p&gt;$$ \therefore \text{RHT} = 0 $$&lt;/p&gt;
+&lt;p&gt;Moving back to the original expression, we&amp;rsquo;re then left with:&lt;/p&gt;
+&lt;p&gt;$$ \partial_{\hat n} u_{i,\parallel} =  (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j \partial_j (u_k) +
+\cancelto{0}{u_k \hat n_j \partial_j (\delta_{ik} - \hat n_k \hat n_i)}$$&lt;/p&gt;
+&lt;p&gt;Note that we already have the gradient of velocity in the last term, thus:&lt;/p&gt;
+&lt;p&gt;$$ \partial_{\hat n} u_{i,\parallel} =  (\delta_{ik} - \hat n_k \hat n_i)
+\hat n_j E_{kj} $$&lt;/p&gt;
+&lt;p&gt;$$ \therefore \left (\frac{\partial u_\parallel}{\partial n}\right )
+\Bigg\rvert_{n=0} = \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} = f(\hat n, E_{ij})$$&lt;/p&gt;
+&lt;p&gt;To obtain $\tau_w$, simply multiply by $\mu$:&lt;/p&gt;
+&lt;p&gt;$$\tau_w = \mu \bigg( \big[(\delta_{ik} - \hat n_k \hat n_i) \hat n_j
+\big] E_{kj} \bigg) \Bigg\rvert_{n=0} $$&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Deriving Vorticity Transport in Index Notation</title>
+      <link>https://www.jameswright.xyz/post/20200722/vorticity_transport_index_notation/</link>
+      <pubDate>Wed, 22 Jul 2020 08:51:52 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200722/vorticity_transport_index_notation/</guid>
+      <description>&lt;h2 id=&#34;definitions-and-useful-tools&#34;&gt;Definitions and Useful Tools&lt;/h2&gt;
+&lt;h3 id=&#34;notation&#34;&gt;Notation&lt;/h3&gt;
+&lt;p&gt;The vorticity transport equation can simply be calculated by taking the curl of
+the conservation of momentum evolution equations. See my earlier post going
+over &lt;a href=&#34;https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/&#34;&gt;expressing curl in index summation notation&lt;/a&gt;. In summary, the
+curl of a vector $a_j$ can be expressed as:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times a_j  = b_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i a_j =
+b_k $$&lt;/p&gt;
+&lt;p&gt;where $\varepsilon_{ijk}$ is the &lt;a href=&#34;https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/#levi-civita-symbol&#34;&gt;Levi-Civita symbol&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Note that I&amp;rsquo;ll be using shorthand to express the differential operator,
+$\partial_\phi$, where the index $\phi$ is the index of a spacial variable
+&lt;em&gt;except&lt;/em&gt; for $t$, which represents a time derivative:&lt;/p&gt;
+&lt;p&gt;$$ \frac{\partial}{\partial x_i} = \partial_i \quad \mathrm{and} \quad
+\frac{\partial}{\partial t} = \partial_t$$&lt;/p&gt;
+&lt;p&gt;For double derivatives, a superscript will be used:&lt;/p&gt;
+&lt;p&gt;$$ \frac{\partial}{\partial x_i} \frac{\partial}{\partial x_i} =
+\frac{\partial^2}{\partial x_i^2} =
+\partial_i^2 $$&lt;/p&gt;
+&lt;h3 id=&#34;math-properties&#34;&gt;Math Properties&lt;/h3&gt;
+&lt;p&gt;Some useful properties of the Levi-Civita symbol that will be used are that it
+is commutative in multiplication and, since it is invariant of space and time,
+it can be brought in or outside a differential operator operator like a
+constant:&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{ijk}\frac{\partial}{\partial x_i} (\phi ) =
+\frac{\partial}{\partial x_i} (\varepsilon_{ijk} \phi ) $$&lt;/p&gt;
+&lt;p&gt;Using the &lt;a href=&#34;https://en.wikipedia.org/wiki/Levi-Civita_symbol#Product&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;product identity of permutation tensors
+&lt;/a&gt;, you can also
+convert permutation tensors into &lt;a href=&#34;https://en.wikipedia.org/wiki/Kronecker_delta&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Kronecker
+deltas&lt;/a&gt;, $\delta_{ij}$:&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{ijk} \varepsilon_{imn} = \delta_{jm}\delta_{kn} -
+\delta_{jn}\delta_{km} $$&lt;/p&gt;
+&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;div&gt;
+    Hint: To convert from some arbitrary pair of Levi-Civita symbols that share
+one index, first rearrange their indices such that the shared index is the
+first for both. Then, the ordering of the Kronecker delta indices is $
+\delta_{a_2\  b_2} \delta_{a_3\  b_3} - \delta_{a_2\  b_3} \delta_{a_3\  b_2}$ ,
+where $a_i$ and $b_i$ represent the indices of the different Levi-Civita
+symbols and their subscripts represent which index is placed in that Kronecker
+delta.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Speaking of Kronecker deltas, they have the handy effect of changing indices:&lt;/p&gt;
+&lt;p&gt;$$ \delta_{ij} a_i = a_j $$&lt;/p&gt;
+&lt;p&gt;Differential operators are order invariant:&lt;/p&gt;
+&lt;p&gt;$$ \partial_i (\partial_j (u_k))  = \partial_j (\partial_i (u_k))$$&lt;/p&gt;
+&lt;div class=&#34;alert alert-warning&#34;&gt;
+  &lt;div&gt;
+    I will be dropping the use of parentheses for the
+differential operator, but note that it &lt;em&gt;is&lt;/em&gt; an operator and is not
+commutative: $\partial_i u_j \neq u_j \partial_i$
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;With that taken care of, onto the derivation!&lt;/p&gt;
+&lt;h2 id=&#34;curl-of-momentum-evolution&#34;&gt;Curl of Momentum Evolution&lt;/h2&gt;
+&lt;p&gt;The index notation form of the incompressible momentum evolution (or
+conservation of momentum equations) is:&lt;/p&gt;
+&lt;p&gt;$$ \partial_t u_i + u_j \partial_j u_i = - \tfrac{1}{\rho} \partial_i p +
+\nu \partial_j^2 u_i $$&lt;/p&gt;
+&lt;p&gt;Vorticity, $\omega_k$, is given as the curl of velocity, or:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times u_j  = \omega_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i u_j =
+\omega_k $$&lt;/p&gt;
+&lt;p&gt;To get vorticity evolution, we can take the curl of the momentum transport equations:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times [\partial_t u_i + u_j \partial_j u_i = -
+\tfrac{1}{\rho} \partial_i p + \nu \partial_j^2 u_i ]$$&lt;/p&gt;
+&lt;p&gt;In index notation, this is the equivalent of multiplying by the Levi-Civita
+symbol and a corresponding differential operator:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \varepsilon_{k\ell i} \partial_\ell [\partial_t u_i + u_j
+\partial_j u_i = - \tfrac{1}{\rho} \partial_i p + \nu \partial_j^2 u_i ]$$&lt;/p&gt;
+&lt;p&gt;Distributing this across the terms, we get:&lt;/p&gt;
+&lt;p&gt;$$ \begin{align}
+\underbrace{\varepsilon_{k\ell i} \partial_\ell
+\partial_t u_i}&lt;em&gt;\text{Temporal Term} +
+\underbrace{\varepsilon&lt;/em&gt;{k\ell i} \partial_\ell
+u_j \partial_j u_i}&lt;em&gt;\text{Advection Term} &amp;amp; =
+\underbrace{- \varepsilon&lt;/em&gt;{k\ell i} \partial_\ell
+\tfrac{1}{\rho} \partial_i p}&lt;em&gt;\text{Pressure Term} +
+\underbrace{\varepsilon&lt;/em&gt;{k\ell i} \partial_\ell
+\nu \partial_j^2 u_i}_\text{Viscous Term} \\
+\Rightarrow \quad \mathbb{T} + \mathbb{A} &amp;amp; = \mathbb{P} + \mathbb{V}
+\end{align}$$&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;ll treat the named terms individually, then put them back together. I&amp;rsquo;ll
+leave the advection term for last since it&amp;rsquo;s more involved than the other
+three.&lt;/p&gt;
+&lt;h2 id=&#34;individual-terms&#34;&gt;Individual Terms&lt;/h2&gt;
+&lt;h3 id=&#34;temporal-term-mathbbt&#34;&gt;Temporal Term $\mathbb{T}$&lt;/h3&gt;
+&lt;p&gt;$$\mathbb{T} = \varepsilon_{k\ell i} \partial_\ell \partial_t u_i $$&lt;/p&gt;
+&lt;p&gt;Using the order invariance of derivatives and moving $\varepsilon_{k\ell i}$
+inside the derivative operators, we can get the following:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad  \partial_t \varepsilon_{k\ell i} \partial_\ell u_i $$&lt;/p&gt;
+&lt;p&gt;Since we know that $\omega_k = \varepsilon_{k\ell i} \partial_\ell u_i$, then
+we can write:&lt;/p&gt;
+&lt;p&gt;$$\mathbb{T} = \partial_t \omega_k $$&lt;/p&gt;
+&lt;h3 id=&#34;pressure-term-mathbbp&#34;&gt;Pressure Term $\mathbb{P}$&lt;/h3&gt;
+&lt;p&gt;$$ \mathbb{P} = - \varepsilon_{k\ell i} \partial_\ell \tfrac{1}{\rho}
+\partial_i p $$&lt;/p&gt;
+&lt;p&gt;First we can move the density term out of the derivatives:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad - \tfrac{1}{\rho} \varepsilon_{k\ell i} \partial_\ell
+\partial_i p $$&lt;/p&gt;
+&lt;p&gt;The next step can go one of two ways. First you can simply use the fact that
+the curl of a gradient of a scalar equals zero ($\nabla \times (\partial_i
+\phi) = \mathbf{0}$). Or, you can be like me and want to prove that it is
+zero. I&amp;rsquo;ll probably do the former here, and put the latter in a separate post.
+Using the first method, we get that:&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{P} = \mathbf{0} $$&lt;/p&gt;
+&lt;h3 id=&#34;viscous-term-mathbbv&#34;&gt;Viscous Term $\mathbb{V}$&lt;/h3&gt;
+&lt;p&gt;$$ \mathbb{V} = \varepsilon_{k\ell i} \partial_\ell \nu \partial_j^2 u_i $$&lt;/p&gt;
+&lt;p&gt;This step is almost identical to the Temporal Term; rearrange the terms such
+that you have the curl of velocity in order to get vorticity:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad \nu \partial_j^2 \varepsilon_{k\ell i} \partial_\ell u_i $$&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \quad \mathbb{V} = \nu \partial_j^2 \omega_k $$&lt;/p&gt;
+&lt;h3 id=&#34;advection-term-mathbba&#34;&gt;Advection Term $\mathbb{A}$&lt;/h3&gt;
+&lt;p&gt;$$ \mathbb{A} = \varepsilon_{k\ell i} \partial_\ell u_j \partial_j u_i $$&lt;/p&gt;
+&lt;p&gt;This is quite a bit more tricky than the other three terms. Note that the
+derivatives are operators, so this maybe more explicitly written as:&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{A} = \varepsilon_{k\ell i} \partial_\ell (u_j \partial_j (u_i) ) $$&lt;/p&gt;
+&lt;p&gt;First, we&amp;rsquo;ll use a specialized property/rule:&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) + (\nabla \times
+u_n) \times u_q $$&lt;/p&gt;
+&lt;p&gt;This is proved in the &lt;a href=&#34;#appendix-a&#34;&gt;Appendix A&lt;/a&gt;. Converting the right term into
+index notation we get:&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) +
+\varepsilon_{ijq} u_q (\varepsilon_{jmn} \partial_m u_n)  $$&lt;/p&gt;
+&lt;p&gt;Notice that the term in parentheses on the right is already the curl of
+velocity, so we&amp;rsquo;ll go ahead and turn that into vorticity.&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) +
+\varepsilon_{ijq} \omega_j u_q $$&lt;/p&gt;
+&lt;p&gt;Plugging this back into our expression for $\mathbb{A}$, we get:&lt;/p&gt;
+&lt;p&gt;$$\mathbb{A} = \varepsilon_{k\ell i} \partial_\ell [\partial_i
+(\tfrac{1}{2} u_j u_j ) + \varepsilon_{ijq} \omega_j u_q  ] $$&lt;/p&gt;
+&lt;p&gt;Distributing this through, we get:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \varepsilon_{k\ell i} \partial_\ell [\partial_i (\tfrac{1}{2}
+u_j u_j ) ] + \varepsilon_{k\ell i} \partial_\ell [ \varepsilon_{ijq}
+\omega_j u_q ] $$&lt;/p&gt;
+&lt;p&gt;For the lefthand term, note that $u_j u_j$ is just a scalar. Therefore, the
+left expression can be surmised as the curl of the gradient of a scalar and it
+is then equal to zero. This leaves us with:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \mathbb{A} = \varepsilon_{k\ell i} \partial_\ell [
+\varepsilon_{ijq} \omega_j u_q ] $$&lt;/p&gt;
+&lt;p&gt;Now let&amp;rsquo;s move $\varepsilon_{ijq}$ outside the differential and change the
+indices of $\varepsilon_{k\ell i} \Rightarrow \varepsilon_{ik\ell}$: :&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \mathbb{A} = \varepsilon_{ik\ell} \varepsilon_{ijq}
+\partial_\ell \omega_j u_q$$&lt;/p&gt;
+&lt;p&gt;Since we have two Levi-Civita symbols, we can utilize the permutation tensor&amp;rsquo;s
+product identity shown in the &lt;a href=&#34;#math-properties&#34;&gt;Math Properties section&lt;/a&gt; to
+turn this into an expression of Kronecker deltas.&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{ik\ell} \varepsilon_{ijq} = \delta_{kj}\delta_{\ell q} -
+\delta_{kq}\delta_{\ell j} $$&lt;/p&gt;
+&lt;p&gt;which gives us&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{A} = (\delta_{kj}\delta_{\ell q} - \delta_{kq}\delta_{\ell j} )
+\partial_\ell \omega_j u_q $$&lt;/p&gt;
+&lt;p&gt;Using the Kronecker deltas to change indices yields:&lt;/p&gt;
+&lt;p&gt;$$ \mathbb{A} = \partial_q \omega_k u_q - \partial_j \omega_j u_k $$&lt;/p&gt;
+&lt;p&gt;Next, use the product rule to expand the derivatives:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \ (u_q \partial_q \omega_k + \omega_k \partial_q  u_q) -
+( u_k \partial_j \omega_j  + \omega_j \partial_j  u_k)$$&lt;/p&gt;
+&lt;p&gt;By incompressibility $\partial_q u_q =0$ (ie. the divergence of velocity is
+zero). Also, $\partial_j \omega_j$ also equals zero, which is proven in
+&lt;a href=&#34;#appendix-b&#34;&gt;Appendix B&lt;/a&gt;. Substituting in we are left with:&lt;/p&gt;
+&lt;p&gt;$$ (u_q \partial_q \omega_k + 0) - ( 0  + \omega_j \partial_j  u_k) $$&lt;/p&gt;
+&lt;p&gt;And thus we &lt;em&gt;finally&lt;/em&gt; get the final form of the advection term:&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \  \mathbb{A} = \underbrace{u_q \partial_q
+\omega_k}_\text{Vorticity Advection}  - \underbrace{\omega_j \partial_j
+u_k}_\text{Vorticity Stretching} $$&lt;/p&gt;
+&lt;h2 id=&#34;putting-it-all-together&#34;&gt;Putting It All Together&lt;/h2&gt;
+&lt;p&gt;When we combine the terms together, we finally get the full vorticity transport
+equation:&lt;/p&gt;
+&lt;p&gt;$$
+\underbrace{\partial_t \omega_k}_\mathbb{T}  +
+\underbrace{u_q \partial_q \omega_k  - \omega_j \partial_j u_k}_\mathbb{A} =
+\underbrace{0}_\mathbb{P} +
+\underbrace{\nu \partial_j^2 \omega_k}_\mathbb{V}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;appendix&#34;&gt;Appendix&lt;/h2&gt;
+&lt;h3 id=&#34;appendix-a&#34;&gt;Appendix A&lt;/h3&gt;
+&lt;p&gt;Prove: $$ u_j \partial_j u_i = \partial_i (\tfrac{1}{2} u_j u_j ) + (\nabla
+\times u_n) \times u_q $$&lt;/p&gt;
+&lt;p&gt;Starting with the righthand side, put in index notation:&lt;/p&gt;
+&lt;p&gt;$$\partial_i (\tfrac{1}{2} u_j u_j ) + \varepsilon_{ijq} u_q
+(\varepsilon_{jmn} \partial_m u_n) $$&lt;/p&gt;
+&lt;p&gt;Take the right term and rearrange it:
+$$ &amp;hellip; + \varepsilon_{jqi} \varepsilon_{jmn} u_q  \partial_m u_n $$&lt;/p&gt;
+&lt;p&gt;Convert the product of Levi-Civita symbols to Kronecker deltas:&lt;/p&gt;
+&lt;p&gt;$$ &amp;hellip; + (\delta_{qm} \delta_{in} - \delta_{qn}\delta_{im} ) u_q  \partial_m
+u_n $$&lt;/p&gt;
+&lt;p&gt;$$ \Rightarrow \ &amp;hellip; + u_m  \partial_m u_i  - u_n  \partial_i u_n $$&lt;/p&gt;
+&lt;p&gt;Change dummy indices in each term to match (for aesthetics):&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_j u_i = \tfrac{1}{2} \partial_i (u_j u_j) + u_j  \partial_j
+u_i  - u_j  \partial_i u_j $$&lt;/p&gt;
+&lt;p&gt;Using product rule, we have $\partial_i (u_j u_j) = u_j \partial_i u_j + u_j
+\partial_i u_j = 2 u_j \partial_i u_j $.  Substituting this in yields:&lt;/p&gt;
+&lt;p&gt;$$ u_j \partial_i u_j + u_j  \partial_j u_i  - u_j  \partial_i u_j $$&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow u_j \partial_j u_i $$&lt;/p&gt;
+&lt;h3 id=&#34;appendix-b&#34;&gt;Appendix B&lt;/h3&gt;
+&lt;p&gt;Prove:
+$$\partial_j \omega_j = 0$$&lt;/p&gt;
+&lt;p&gt;Revert vorticity back to it&amp;rsquo;s original definition:&lt;/p&gt;
+&lt;p&gt;$$\partial_j \varepsilon_{jik} \partial_i u_k \Rightarrow
+\varepsilon_{jik} \partial_j \partial_i u_k $$&lt;/p&gt;
+&lt;p&gt;Since the permutation tensor is antisymmetric in its indices,
+$\varepsilon_{jik} = -\varepsilon_{ijk}$.&lt;/p&gt;
+&lt;p&gt;$$\varepsilon_{jik} \partial_j \partial_i u_k = - \varepsilon_{ijk} \partial_j
+\partial_i u_k $$&lt;/p&gt;
+&lt;p&gt;Since all the indices are dummy indices, they maybe changed/switched
+arbitrarily. Let&amp;rsquo;s switch the $j$ and $i$ indices:&lt;/p&gt;
+&lt;p&gt;$$\Rightarrow \ \varepsilon_{jik} \partial_j \partial_i u_k = -
+\varepsilon_{jik} \partial_i \partial_j u_k $$&lt;/p&gt;
+&lt;p&gt;Additionally, the derivatives are order invariant, so we can rearrange them:&lt;/p&gt;
+&lt;p&gt;$$\varepsilon_{jik} \partial_j \partial_i u_k = - \varepsilon_{jik} \partial_j
+\partial_i u_k $$&lt;/p&gt;
+&lt;p&gt;This is only possible if $\varepsilon_{jik} \partial_j \partial_i u_k = 0$. Thus:&lt;/p&gt;
+&lt;p&gt;$$ \varepsilon_{jik} \partial_j \partial_i u_k  =  \partial_j \omega_j = 0$$&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Cross Product and Curl in Index Notation</title>
+      <link>https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/</link>
+      <pubDate>Tue, 21 Jul 2020 18:00:45 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/post/20200721/cross_product_and_curl_in_index_notation/</guid>
+      <description>&lt;p&gt;Here are some brief notes on performing a cross-product using index notation.
+This requires use of the &lt;a href=&#34;https://en.wikipedia.org/wiki/Levi-Civita_symbol&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Levi-Civita
+symbol&lt;/a&gt;, which may also be
+called the permutation tensor.&lt;/p&gt;
+&lt;h2 id=&#34;levi-civita-symbol&#34;&gt;Levi-Civita Symbol&lt;/h2&gt;
+&lt;p&gt;The Levi-Civita symbol is often expressed using an $\varepsilon$ and takes the
+following definition:&lt;/p&gt;
+&lt;p&gt;$$  \varepsilon_{ijk} =
+\begin{cases}
++1 &amp;amp; \text{if } (i,j,k) \text{ is even permutation,} \\
+-1 &amp;amp; \text{if } (i,j,k) \text{ is odd permutation,} \\
+0 &amp;amp; \text{if } i = j, \text{ or } j = k, \text{ or } k = i
+\end{cases}
+$$&lt;/p&gt;
+&lt;p&gt;For a 3D system, the definition of an odd or even permutation can be shown in
+&lt;a href=&#34;#figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg&#34;&gt;Figure 1&lt;/a&gt;.&lt;/p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  id=&#34;figure-permutation-pattern-for-levi-civita-symbol-in-3d-altered-from-sourcehttpscommonswikimediaorgwikifilepermutation_indices_3d_numericalsvg&#34;&gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;./Permutation_indices_3d_numerical_edit.png&#34; alt=&#34;Permutation pattern for Levi-Civita symbol in 3D. [Altered from source.](https://commons.wikimedia.org/wiki/File:Permutation_indices_3d_numerical.svg)&#34; loading=&#34;lazy&#34; data-zoomable width=&#34;50%&#34; /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;figcaption data-pre=&#34;Figure&amp;nbsp;&#34; data-post=&#34;:&amp;nbsp;&#34; class=&#34;numbered&#34;&gt;
+      Permutation pattern for Levi-Civita symbol in 3D. &lt;a href=&#34;https://commons.wikimedia.org/wiki/File:Permutation_indices_3d_numerical.svg&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Altered from source.&lt;/a&gt;
+    &lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;The permutation is even if the three numbers of the index are in &amp;ldquo;order&amp;rdquo;, given
+allowance to cycle back through the numbers once the end is reached. So if you
+skip to the 1 value in the index, going left-to-right should be in numerical
+order. For example, if given 321 and starting with the 1 we get 1 $\rightarrow$
+3 $\rightarrow$ 2. 132 is not in numerical order, thus it is an odd permutation.&lt;/p&gt;
+&lt;p&gt;So given $\varepsilon_{ijk}\,$, if $i$, $j$, and $k$ are $123$, $231$, or $312$,
+then $\varepsilon_{ijk}=1$. Note that the order of the indicies matter. If
+instead we&amp;rsquo;re given $\varepsilon_{jik}$ and any of the three permutations in
+the previous example, then the expression would be equal to $-1$ instead.&lt;/p&gt;
+&lt;h2 id=&#34;cross-products-in-index-notation&#34;&gt;Cross Products in Index Notation&lt;/h2&gt;
+&lt;p&gt;Now we get to the implementation of cross products. This involves transitioning
+back and forth from vector notation to index notation. A vector and it&amp;rsquo;s index
+notation equivalent are given as:&lt;/p&gt;
+&lt;p&gt;$$ \mathbf{a} = a_i$$&lt;/p&gt;
+&lt;p&gt;If we want to take the cross product of this with a vector $\mathbf{b} = b_j$,
+we get:&lt;/p&gt;
+&lt;p&gt;$$ \mathbf{a} \times \mathbf{b}  = a_i \times b_j \ \Rightarrow  &lt;br&gt;
+\varepsilon_{ijk} a_i b_j = c_k$$&lt;/p&gt;
+&lt;p&gt;Note the indices, where the resulting vector $c_k$ inherits the index not used
+by the original vectors. Also note that since the cross product is
+anticommutative (ie. $\mathbf{a} \times \mathbf{b} = - \mathbf{b} \times
+\mathbf{a}$ ), changing the order of the vectors being crossed requires
+changing the indices of the Levi-Civita symbol or adding a negative:&lt;/p&gt;
+&lt;p&gt;$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j =
+-\varepsilon_{ijk} a_i b_j = c_k$$&lt;/p&gt;
+&lt;p&gt;Conversely, the commutativity of multiplication (which is valid in index
+notation) means that the vector order &lt;em&gt;can&lt;/em&gt; be changed without changing the
+permutation symbol indices or anything else:&lt;/p&gt;
+&lt;p&gt;$$ b_j \times a_i \ \Rightarrow  \ \varepsilon_{jik} a_i b_j  =
+\varepsilon_{jik} b_j a_i$$&lt;/p&gt;
+&lt;h3 id=&#34;rules-of-thumb-for-setting-indices-correctly&#34;&gt;Rule(s) of Thumb for Setting Indices Correctly&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Start the indices of the permutation symbol with the index of the resulting
+vector.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This will often be the free index of the equation that
+the cross product lives in and I normally like to have the free index as the
+leading index in multi-index terms.&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;The next two indices need to be in the same order as the vectors from the
+cross product.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Using these rules, say we want to replicate $a_\ell \times b_k = c_j$. Then the
+first index needs to be $j$ since $c_j$ is the resulting vector. The other 2
+indices must be $\ell$ and $k$ then. This results in:&lt;/p&gt;
+&lt;p&gt;$$ a_\ell \times b_k = c_j \quad \Rightarrow \quad \varepsilon_{j\ell k} a_\ell
+b_k = c_j$$&lt;/p&gt;
+&lt;h2 id=&#34;curl-in-index-notation&#34;&gt;Curl in Index Notation&lt;/h2&gt;
+&lt;p&gt;The curl is given as the cross product of the gradient and some vector field:&lt;/p&gt;
+&lt;p&gt;$$ \mathrm{curl}({a_j}) = \nabla \times a_j  = b_k $$&lt;/p&gt;
+&lt;p&gt;In index notation, this would be given as:&lt;/p&gt;
+&lt;p&gt;$$ \nabla \times a_j  = b_k \ \Rightarrow \ \varepsilon_{ijk} \partial_i a_j =
+b_k $$&lt;/p&gt;
+&lt;p&gt;where $\partial_i$ is the differential operator $\frac{\partial}{\partial
+x_i}$.&lt;/p&gt;
+&lt;div class=&#34;alert alert-warning&#34;&gt;
+  &lt;div&gt;
+    Note that $\partial_k$ is &lt;em&gt;&lt;strong&gt;not&lt;/strong&gt;&lt;/em&gt; commutative since it is an operator. It may be
+better to write $\partial_k u_i$ as $\partial_k (u_i)$ to more explicitly
+denote it&amp;rsquo;s nature as an operator on $u_i$.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;These follow the same rules as with a normal cross product, but the
+first &amp;ldquo;vector&amp;rdquo; is always going to be the differential operator. Since $\nabla$
+is hardly ever defined with an index, the &lt;a href=&#34;#rules-of-thumb-for-setting-indices-correctly&#34;&gt;rule of
+thumb&lt;/a&gt; can come in handy when
+trying to translate vector notation curl into index notation.&lt;/p&gt;
+&lt;p&gt;For example, if I have a vector $u_i$ and I want to take the curl of it, first
+I need to decide what I want the resulting vector index to be. Let&amp;rsquo;s make it be
+$\ell$.  Due to index summation rules, the index we assign to the differential
+operator may be any character that isn&amp;rsquo;t $i$ or $\ell$ in our case. Let&amp;rsquo;s make
+it be $k$. Putting that all together we get:&lt;/p&gt;
+&lt;p&gt;$$ \mathrm{curl}(u_i) = \varepsilon_{\ell ki} \partial_k u_i = \omega_\ell $$&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
