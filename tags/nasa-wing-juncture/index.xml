@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NASA Wing Juncture | James Wright</title>
+    <link>https://www.jameswright.xyz/tags/nasa-wing-juncture/</link>
+      <atom:link href="https://www.jameswright.xyz/tags/nasa-wing-juncture/index.xml" rel="self" type="application/rss+xml" />
+    <description>NASA Wing Juncture</description>
+    <generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Wed, 01 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_hu5565312668262403012.png</url>
+      <title>NASA Wing Juncture</title>
+      <link>https://www.jameswright.xyz/tags/nasa-wing-juncture/</link>
+    </image>
+    
+    <item>
+      <title>Hybrid Turbulence Model Computations of the NASA Juncture Flow Model Using PHASTA</title>
+      <link>https://www.jameswright.xyz/publication/scitech_2020/</link>
+      <pubDate>Wed, 01 Jan 2020 00:00:00 +0000</pubDate>
+      <guid>https://www.jameswright.xyz/publication/scitech_2020/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

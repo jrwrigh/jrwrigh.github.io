@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PETSc | James Wright</title>
+    <link>https://www.jameswright.xyz/tags/petsc/</link>
+      <atom:link href="https://www.jameswright.xyz/tags/petsc/index.xml" rel="self" type="application/rss+xml" />
+    <description>PETSc</description>
+    <generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Tue, 28 Mar 2023 09:22:48 -0600</lastBuildDate>
+    <image>
+      <url>https://www.jameswright.xyz/media/icon_hu5565312668262403012.png</url>
+      <title>PETSc</title>
+      <link>https://www.jameswright.xyz/tags/petsc/</link>
+    </image>
+    
+    <item>
+      <title>Performance-Portable Implicit Scale-Resolving Compressible Flow Using libCEED</title>
+      <link>https://www.jameswright.xyz/publication/siam_cse23_implicit_srs_with_libceed/</link>
+      <pubDate>Tue, 28 Mar 2023 09:22:48 -0600</pubDate>
+      <guid>https://www.jameswright.xyz/publication/siam_cse23_implicit_srs_with_libceed/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
